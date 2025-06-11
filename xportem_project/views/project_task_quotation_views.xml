@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Quotation Line Form View -->
+    <record id="view_project_task_quotation_line_form" model="ir.ui.view">
+        <field name="name">project.task.quotation.line.form</field>
+        <field name="model">project.task.quotation.line</field>
+        <field name="arch" type="xml">
+            <form string="Línea de Cotización">
+                <header>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="draft,sent,received,selected"/>
+                    <button name="action_mark_received" 
+                            type="object" 
+                            string="Marcar como Recibida" 
+                            class="btn-primary"
+                            invisible="state not in ['draft', 'sent']"
+                            confirm="¿Confirmar que se recibió esta cotización?"/>
+                    <button name="action_select_quotation" 
+                            type="object" 
+                            string="Seleccionar Esta Cotización" 
+                            class="btn-success"
+                            invisible="state != 'received' or is_selected"
+                            confirm="¿Seleccionar esta cotización como ganadora? Esto rechazará las demás cotizaciones."/>
+                    <button name="action_reject_quotation" 
+                            type="object" 
+                            string="Rechazar" 
+                            class="btn-danger"
+                            invisible="state in ['selected', 'rejected']"
+                            confirm="¿Está seguro de rechazar esta cotización?"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_supplier" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-building">
+                            <field name="supplier_rating" widget="statinfo" string="Rating"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group string="Información General">
+                            <field name="task_id" readonly="1" force_save="1"/>
+                            <field name="supplier_id" 
+                                   required="1"
+                                   readonly="state in ['received', 'selected', 'rejected']"
+                                   domain="[('x_is_china_supplier', '=', True)]"/>
+                            <field name="sequence" readonly="state in ['received', 'selected', 'rejected']"/>
+                            <field name="is_selected" readonly="1"/>
+                        </group>
+                        <group string="Detalles del Producto">
+                            <field name="product_name" required="1" readonly="state in ['received', 'selected', 'rejected']"/>
+                            <field name="quantity" required="1" readonly="state in ['received', 'selected', 'rejected']"/>
+                            <field name="price_unit" required="1" readonly="state in ['received', 'selected', 'rejected']"/>
+                            <field name="currency_id" groups="base.group_multi_currency" readonly="state in ['received', 'selected', 'rejected']"/>
+                            <field name="price_total" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Términos Comerciales">
+                            <field name="delivery_term" readonly="state in ['received', 'selected', 'rejected']"/>
+                            <field name="lead_time" readonly="state in ['received', 'selected', 'rejected']"/>
+                            <field name="payment_terms" readonly="state in ['received', 'selected', 'rejected']"/>
+                            <field name="minimum_order_qty" readonly="state in ['received', 'selected', 'rejected']"/>
+                        </group>
+                        <group string="Validez">
+                            <field name="validity_date" readonly="state in ['received', 'selected', 'rejected']"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Descripción">
+                        <field name="description" nolabel="1" 
+                               readonly="state in ['received', 'selected', 'rejected']"
+                               placeholder="Descripción detallada del producto cotizado..."/>
+                    </group>
+                    
+                    <group string="Documentación">
+                        <field name="quotation_filename" invisible="1"/>
+                        <field name="quotation_file" filename="quotation_filename" readonly="state in ['received', 'selected', 'rejected']"/>
+                    </group>
+                    
+                    <group string="Notas">
+                        <field name="notes" nolabel="1" 
+                               readonly="state in ['received', 'selected', 'rejected']"
+                               placeholder="Notas adicionales sobre esta cotización..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Quotation Line List View -->
+    <record id="view_project_task_quotation_line_list" model="ir.ui.view">
+        <field name="name">project.task.quotation.line.list</field>
+        <field name="model">project.task.quotation.line</field>
+        <field name="arch" type="xml">
+            <list string="Líneas de Cotización" 
+                  default_order="task_id,supplier_id,sequence"
+                  decoration-success="is_selected==True"
+                  decoration-muted="state=='rejected'"
+                  create="1" edit="1">
+                <field name="sequence" widget="handle"/>
+                <field name="task_id"/>
+                <field name="supplier_id"/>
+                <field name="product_name"/>
+                <field name="quantity"/>
+                <field name="price_unit"/>
+                <field name="currency_id" groups="base.group_multi_currency"/>
+                <field name="price_total" sum="Total"/>
+                <field name="delivery_term"/>
+                <field name="lead_time" string="Días"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state=='selected'"
+                       decoration-info="state=='received'"
+                       decoration-warning="state=='sent'"/>
+                <field name="is_selected" invisible="1"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Quotation Line Pivot View -->
+    <record id="view_project_task_quotation_line_pivot" model="ir.ui.view">
+        <field name="name">project.task.quotation.line.pivot</field>
+        <field name="model">project.task.quotation.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Cotizaciones">
+                <field name="supplier_id" type="row"/>
+                <field name="task_id" type="col"/>
+                <field name="price_total" type="measure"/>
+                <field name="price_unit" type="measure"/>
+                <field name="lead_time" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    
+    <!-- Quotation Line Graph View -->
+    <record id="view_project_task_quotation_line_graph" model="ir.ui.view">
+        <field name="name">project.task.quotation.line.graph</field>
+        <field name="model">project.task.quotation.line</field>
+        <field name="arch" type="xml">
+            <graph string="Comparación de Cotizaciones" type="bar">
+                <field name="supplier_id"/>
+                <field name="price_total" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    
+    <!-- Quotation Line Search View -->
+    <record id="view_project_task_quotation_line_search" model="ir.ui.view">
+        <field name="name">project.task.quotation.line.search</field>
+        <field name="model">project.task.quotation.line</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Cotizaciones">
+                <field name="product_name"/>
+                <field name="supplier_id"/>
+                <field name="task_id"/>
+                <field name="delivery_term"/>
+                
+                <filter string="Seleccionadas" name="selected"
+                        domain="[('is_selected', '=', True)]"/>
+                <filter string="Recibidas" name="received"
+                        domain="[('state', '=', 'received')]"/>
+                <filter string="Pendientes" name="pending"
+                        domain="[('state', 'in', ['draft', 'sent'])]"/>
+                <filter string="Rechazadas" name="rejected"
+                        domain="[('state', '=', 'rejected')]"/>
+                
+                <separator/>
+                
+                <filter string="Alta Calificación" name="high_rating"
+                        domain="[('supplier_rating', '>=', 4)]"/>
+                <filter string="Entrega Rápida" name="fast_delivery"
+                        domain="[('lead_time', '&lt;=', 30)]"/>
+                
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Tarea" name="group_task"
+                            context="{'group_by': 'task_id'}"/>
+                    <filter string="Proveedor" name="group_supplier"
+                            context="{'group_by': 'supplier_id'}"/>
+                    <filter string="Estado" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Término de Entrega" name="group_delivery"
+                            context="{'group_by': 'delivery_term'}"/>
+                    <filter string="Moneda" name="group_currency"
+                            context="{'group_by': 'currency_id'}"
+                            groups="base.group_multi_currency"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Action for Quotation Lines -->
+    <record id="action_project_task_quotation_lines" model="ir.actions.act_window">
+        <field name="name">Cotizaciones de Procura</field>
+        <field name="res_model">project.task.quotation.line</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_project_task_quotation_line_search"/>
+        <field name="context">{'search_default_group_task': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Registrar una nueva cotización
+            </p>
+            <p>
+                Aquí puede registrar las cotizaciones recibidas de los proveedores
+                para cada solicitud de procura. Compare precios, términos de entrega
+                y condiciones para seleccionar la mejor opción.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Window Action Views -->
+    <record id="action_project_task_quotation_lines_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_project_task_quotation_line_list"/>
+        <field name="act_window_id" ref="action_project_task_quotation_lines"/>
+    </record>
+    
+    <record id="action_project_task_quotation_lines_pivot" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_project_task_quotation_line_pivot"/>
+        <field name="act_window_id" ref="action_project_task_quotation_lines"/>
+    </record>
+    
+    <record id="action_project_task_quotation_lines_graph" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_project_task_quotation_line_graph"/>
+        <field name="act_window_id" ref="action_project_task_quotation_lines"/>
+    </record>
+    
+    <record id="action_project_task_quotation_lines_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="4"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_project_task_quotation_line_form"/>
+        <field name="act_window_id" ref="action_project_task_quotation_lines"/>
+    </record>
+    
+</odoo>

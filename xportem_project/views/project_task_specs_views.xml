@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Technical Specs Form View -->
+    <record id="view_project_task_technical_specs_form" model="ir.ui.view">
+        <field name="name">project.task.technical.specs.form</field>
+        <field name="model">project.task.technical.specs</field>
+        <field name="arch" type="xml">
+            <form string="Especificaciones Técnicas del Producto">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_generate_pdf" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-file-pdf-o"
+                                string="Generar PDF"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="product_name" placeholder="Nombre del Producto"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <field name="task_id" readonly="1" force_save="1"/>
+                    </group>
+                    
+                    <notebook>
+                        <!-- Descripción General -->
+                        <page string="Descripción General" name="general_description">
+                            <group>
+                                <group string="Información Básica">
+                                    <field name="product_category"/>
+                                    <field name="quantity_required"/>
+                                    <field name="criticality" widget="selection_badge"/>
+                                </group>
+                                <group string="Dimensiones" invisible="1">
+                                    <field name="dimensions_display"/>
+                                </group>
+                            </group>
+                            <group string="Descripción Detallada">
+                                <field name="detailed_description" nolabel="1" 
+                                       placeholder="Función, características principales del producto..."/>
+                            </group>
+                        </page>
+                        
+                        <!-- Caso de Uso y Aplicación -->
+                        <page string="Aplicación" name="application">
+                            <group>
+                                <group string="Uso del Producto">
+                                    <field name="process_system"/>
+                                    <field name="criticality" widget="selection_badge"/>
+                                </group>
+                            </group>
+                            <group string="Aplicación Específica">
+                                <field name="specific_application" nolabel="1" 
+                                       placeholder="Dónde y cómo se utilizará el producto..."/>
+                            </group>
+                            <group string="Función Principal">
+                                <field name="main_function" nolabel="1" 
+                                       placeholder="Qué debe hacer el producto en la aplicación..."/>
+                            </group>
+                        </page>
+                        
+                        <!-- Características Dimensionales -->
+                        <page string="Dimensiones" name="dimensions">
+                            <group>
+                                <group string="Dimensiones Principales">
+                                    <label for="length" string="Dimensiones (L x A x A)"/>
+                                    <div class="o_row">
+                                        <field name="length" class="oe_inline"/> x
+                                        <field name="width" class="oe_inline"/> x
+                                        <field name="height" class="oe_inline"/>
+                                        <field name="dimension_unit" class="oe_inline"/>
+                                    </div>
+                                    <field name="dimensional_tolerance"/>
+                                </group>
+                                <group string="Peso">
+                                    <label for="approximate_weight"/>
+                                    <div class="o_row">
+                                        <field name="approximate_weight" class="oe_inline"/>
+                                        <field name="weight_unit" class="oe_inline"/>
+                                    </div>
+                                </group>
+                            </group>
+                            <group string="Conexiones e Interfaces">
+                                <field name="connections_interfaces" nolabel="1" 
+                                       placeholder="Tipo y tamaño de conexiones, roscas, bridas, etc..."/>
+                            </group>
+                        </page>
+                        
+                        <!-- Especificaciones de Material -->
+                        <page string="Materiales" name="materials">
+                            <group>
+                                <group string="Material y Acabado">
+                                    <field name="main_material" placeholder="Ej: Acero inoxidable, Aluminio, PVC"/>
+                                    <field name="grade_alloy" placeholder="Ej: AISI 316L, 6061-T6"/>
+                                    <field name="surface_finish" placeholder="Ej: Galvanizado, Anodizado, Pintado"/>
+                                </group>
+                            </group>
+                            <group string="Resistencia Química">
+                                <field name="chemical_resistance" nolabel="1" 
+                                       placeholder="Compatibilidad con fluidos, gases o ambiente de trabajo..."/>
+                            </group>
+                        </page>
+                        
+                        <!-- Condiciones de Operación -->
+                        <page string="Condiciones de Operación" name="operating_conditions">
+                            <group>
+                                <group string="Condiciones Ambientales">
+                                    <field name="installation_environment"/>
+                                    <label for="min_temperature" string="Rango de Temperatura"/>
+                                    <div class="o_row">
+                                        <field name="min_temperature" class="oe_inline"/> °C hasta
+                                        <field name="max_temperature" class="oe_inline"/> °C
+                                    </div>
+                                </group>
+                                <group string="Presión de Trabajo">
+                                    <label for="working_pressure"/>
+                                    <div class="o_row">
+                                        <field name="working_pressure" class="oe_inline"/>
+                                        <field name="pressure_unit" class="oe_inline"/>
+                                    </div>
+                                </group>
+                            </group>
+                            
+                            <group string="Especificaciones Eléctricas" 
+                                   invisible="product_category not in ['equipment', 'instrument']">
+                                <group>
+                                    <label for="voltage" string="Alimentación Eléctrica"/>
+                                    <div>
+                                        <div class="o_row">
+                                            <span>Voltaje:</span>
+                                            <field name="voltage" class="oe_inline"/> V
+                                        </div>
+                                        <div class="o_row">
+                                            <span>Frecuencia:</span>
+                                            <field name="frequency" class="oe_inline"/> Hz
+                                        </div>
+                                        <div class="o_row">
+                                            <span>Fases:</span>
+                                            <field name="phases" class="oe_inline"/>
+                                        </div>
+                                        <div class="o_row">
+                                            <span>Consumo:</span>
+                                            <field name="power_consumption" class="oe_inline"/> kW
+                                        </div>
+                                    </div>
+                                </group>
+                            </group>
+                            
+                            <group string="Capacidad y Rendimiento">
+                                <label for="flow_capacity"/>
+                                <div class="o_row">
+                                    <field name="flow_capacity" class="oe_inline"/>
+                                    <field name="flow_unit" class="oe_inline" placeholder="m³/h, L/min, etc."/>
+                                </div>
+                            </group>
+                            
+                            <group string="Otras Especificaciones de Rendimiento">
+                                <field name="performance_specs" nolabel="1" 
+                                       placeholder="Eficiencia, velocidad, precisión, u otras especificaciones relevantes..."/>
+                            </group>
+                        </page>
+                        
+                        <!-- Notas y Archivos -->
+                        <page string="Documentación" name="documentation">
+                            <group string="Notas Adicionales">
+                                <field name="notes" nolabel="1" 
+                                       placeholder="Cualquier información adicional relevante..."/>
+                            </group>
+                            <group string="Archivos Adjuntos">
+                                <field name="attachment_ids" widget="many2many_binary" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Technical Specs List View -->
+    <record id="view_project_task_technical_specs_list" model="ir.ui.view">
+        <field name="name">project.task.technical.specs.list</field>
+        <field name="model">project.task.technical.specs</field>
+        <field name="arch" type="xml">
+            <list string="Especificaciones Técnicas">
+                <field name="task_id"/>
+                <field name="product_name"/>
+                <field name="product_category"/>
+                <field name="quantity_required"/>
+                <field name="criticality" widget="badge"
+                       decoration-danger="criticality == 'critical'"
+                       decoration-warning="criticality == 'important'"/>
+                <field name="dimensions_display" optional="show"/>
+                <field name="main_material" optional="show"/>
+                <field name="installation_environment" optional="hide"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Technical Specs Search View -->
+    <record id="view_project_task_technical_specs_search" model="ir.ui.view">
+        <field name="name">project.task.technical.specs.search</field>
+        <field name="model">project.task.technical.specs</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Especificaciones">
+                <field name="product_name"/>
+                <field name="task_id"/>
+                <field name="main_material"/>
+                <field name="grade_alloy"/>
+                
+                <filter string="Críticos" name="critical"
+                        domain="[('criticality', '=', 'critical')]"/>
+                <filter string="Importantes" name="important"
+                        domain="[('criticality', '=', 'important')]"/>
+                
+                <separator/>
+                
+                <filter string="Equipos" name="equipment"
+                        domain="[('product_category', '=', 'equipment')]"/>
+                <filter string="Componentes" name="component"
+                        domain="[('product_category', '=', 'component')]"/>
+                <filter string="Materiales" name="material"
+                        domain="[('product_category', '=', 'material')]"/>
+                
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Tarea" name="group_task"
+                            context="{'group_by': 'task_id'}"/>
+                    <filter string="Categoría" name="group_category"
+                            context="{'group_by': 'product_category'}"/>
+                    <filter string="Criticidad" name="group_criticality"
+                            context="{'group_by': 'criticality'}"/>
+                    <filter string="Ambiente" name="group_environment"
+                            context="{'group_by': 'installation_environment'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Technical Specs Action -->
+    <record id="action_project_task_technical_specs" model="ir.actions.act_window">
+        <field name="name">Especificaciones Técnicas</field>
+        <field name="res_model">project.task.technical.specs</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_project_task_technical_specs_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear especificaciones técnicas
+            </p>
+            <p>
+                Defina las características técnicas detalladas de los productos
+                a cotizar, incluyendo dimensiones, materiales, condiciones de
+                operación y requisitos específicos.
+            </p>
+        </field>
+    </record>
+    
+</odoo>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menu items under Xportem root -->
+    
+    <!-- Contacts submenu -->
+    <menuitem id="menu_xportem_contacts"
+              name="Contactos"
+              parent="xportem_base.menu_xportem_root"
+              sequence="10"/>
+    
+    <!-- China Suppliers -->
+    <menuitem id="menu_china_suppliers"
+              name="Proveedores de China"
+              parent="menu_xportem_contacts"
+              action="action_china_suppliers"
+              sequence="10"/>
+    
+    <!-- Procurement Clients -->
+    <menuitem id="menu_procurement_clients"
+              name="Clientes de Procura"
+              parent="menu_xportem_contacts"
+              action="action_procurement_clients"
+              sequence="20"/>
+    
+    <!-- Client Users -->
+    <menuitem id="menu_client_users"
+              name="Usuarios de Clientes"
+              parent="menu_xportem_contacts"
+              action="action_client_users"
+              sequence="30"/>
+</odoo>

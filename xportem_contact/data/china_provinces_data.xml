@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sequence for Client Codes -->
+        <record id="sequence_procurement_client" model="ir.sequence">
+            <field name="name">Procurement Client Code</field>
+            <field name="code">procurement.client</field>
+            <field name="prefix">CLI-</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <!-- Note: Province data is handled by selection field in Python code -->
+        <!-- This file is for future province-related data if needed -->
+    </data>
+</odoo>

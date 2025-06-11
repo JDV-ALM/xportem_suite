@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Procurement Category Action - Defined first to be available for references -->
+    <record id="action_procurement_category" model="ir.actions.act_window">
+        <field name="name">Product Categories</field>
+        <field name="res_model">procurement.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first procurement category
+            </p>
+            <p>
+                Categories help organize products into hierarchical groups.
+                You can create main categories and subcategories to classify
+                the products you procure.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Procurement Category List View -->
+    <record id="view_procurement_category_list" model="ir.ui.view">
+        <field name="name">procurement.category.list</field>
+        <field name="model">procurement.category</field>
+        <field name="arch" type="xml">
+            <list string="Procurement Categories" default_order="sequence, complete_name">
+                <field name="sequence" widget="handle"/>
+                <field name="complete_name"/>
+                <field name="code"/>
+                <field name="parent_id"/>
+                <field name="active" invisible="1"/>
+                <field name="child_count" string="Subcategories"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Procurement Category Form View -->
+    <record id="view_procurement_category_form" model="ir.ui.view">
+        <field name="name">procurement.category.form</field>
+        <field name="model">procurement.category</field>
+        <field name="arch" type="xml">
+            <form string="Procurement Category">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Simple button without action reference for now -->
+                        <button class="oe_stat_button" 
+                                icon="fa-sitemap"
+                                invisible="child_count == 0">
+                            <field name="child_count" widget="statinfo" string="Subcategories"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Category Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Industrial Equipment"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="e.g. IND"/>
+                            <field name="parent_id" options="{'no_create': True}"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" nolabel="1" 
+                                   placeholder="Describe what products belong to this category..."/>
+                        </page>
+                        <page string="Subcategories" invisible="child_count == 0">
+                            <field name="child_ids" context="{'default_parent_id': id}">
+                                <list string="Subcategories" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Procurement Category Search View -->
+    <record id="view_procurement_category_search" model="ir.ui.view">
+        <field name="name">procurement.category.search</field>
+        <field name="model">procurement.category</field>
+        <field name="arch" type="xml">
+            <search string="Search Procurement Categories">
+                <field name="name" string="Category" 
+                       filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="parent_id"/>
+                <field name="code"/>
+                <separator/>
+                <filter string="Top Level" name="top_level" 
+                        domain="[('parent_id', '=', False)]"/>
+                <filter string="Active" name="active" 
+                        domain="[('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" 
+                        domain="[('active', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Parent Category" name="group_parent" 
+                            context="{'group_by': 'parent_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Set search view on action after it's defined -->
+    <record id="action_procurement_category" model="ir.actions.act_window">
+        <field name="search_view_id" ref="view_procurement_category_search"/>
+    </record>
+    
+</odoo>

@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Action for Procurement Requests (defined first) -->
+    <record id="action_procurement_requests" model="ir.actions.act_window">
+        <field name="name">Solicitudes de Procura</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,form,calendar,pivot,graph</field>
+        <field name="context">{
+            'search_default_x_is_request': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear una nueva solicitud de procura
+            </p>
+            <p>
+                Las solicitudes de procura representan productos específicos
+                que los clientes necesitan comprar. Cada solicitud pasa por
+                un proceso estructurado desde la búsqueda de proveedores
+                hasta la entrega final.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Task Form View - Inherit and Extend -->
+    <record id="view_project_task_form_xportem" model="ir.ui.view">
+        <field name="name">project.task.form.xportem</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            
+            <!-- Add invisible fields at the beginning of the sheet -->
+            <xpath expr="//sheet" position="inside">
+                <group invisible="1">
+                    <field name="x_quotation_count"/>
+                    <field name="x_supplier_match_score"/>
+                    <field name="currency_id"/>
+                    <field name="x_has_technical_specs"/>
+                </group>
+            </xpath>
+            
+            <!-- Add checkboxes after tag_ids -->
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <div class="o_row">
+                    <field name="x_is_request" widget="boolean_toggle"/>
+                    <span class="mx-2">Es Solicitud</span>
+                    <field name="x_is_evaluation" widget="boolean_toggle"/>
+                    <span class="mx-2">En Evaluación</span>
+                </div>
+            </xpath>
+            
+            <!-- Add stat buttons -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_quotations" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-file-text-o"
+                        invisible="x_quotation_count == 0">
+                    <field name="x_quotation_count" widget="statinfo" string="Cotizaciones"/>
+                </button>
+                <button class="oe_stat_button" 
+                        icon="fa-thumbs-up"
+                        invisible="x_supplier_match_score == 0">
+                    <field name="x_supplier_match_score" widget="statinfo" string="% Match"/>
+                </button>
+                <button name="action_create_technical_specs" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-cogs"
+                        invisible="not x_is_request">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value" invisible="x_has_technical_specs">
+                            <i class="fa fa-plus"/> Crear
+                        </span>
+                        <span class="o_stat_value text-success" invisible="not x_has_technical_specs">
+                            <i class="fa fa-check"/> Creado
+                        </span>
+                        <span class="o_stat_text">Espec. Técnicas</span>
+                    </div>
+                </button>
+            </xpath>
+            
+            <!-- Add new pages to the notebook using Studio's approach -->
+            <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+                <!-- Product Information Tab -->
+                <page string="Información del Producto" invisible="not x_is_request" name="product_info">
+                    <group>
+                        <group string="Identificación del Producto">
+                            <field name="x_product_id" options="{'no_create': True}"/>
+                            <field name="x_product_name_free" 
+                                   invisible="x_product_id != False"
+                                   required="x_is_request and not x_product_id"/>
+                            <field name="x_category_id" options="{'no_create': True}"/>
+                            <field name="x_product_tags" widget="many2many_tags"
+                                   context="{'default_active': True}"/>
+                        </group>
+                        <group string="Detalles de la Solicitud">
+                            <field name="x_quantity_requested" required="x_is_request"/>
+                            <field name="x_uom_id" required="x_is_request"/>
+                            <field name="x_required_date"/>
+                            <field name="x_urgency" widget="selection_badge"/>
+                            <field name="x_budget_estimated" widget="monetary"/>
+                        </group>
+                    </group>
+                    <group string="Descripción de la Solicitud">
+                        <field name="x_request_description" nolabel="1" 
+                               placeholder="Ingrese los detalles específicos de la solicitud del cliente..."/>
+                    </group>
+                    <group string="Documentación">
+                        <field name="x_request_filename" invisible="1"/>
+                        <field name="x_request_file" filename="x_request_filename"/>
+                        <div class="mt-2">
+                            <button name="action_create_technical_specs" 
+                                    type="object" 
+                                    string="➕ Especificaciones Técnicas Detalladas" 
+                                    class="btn-link"
+                                    help="Crear o editar las especificaciones técnicas completas del producto"/>
+                            <field name="x_has_technical_specs" invisible="1"/>
+                            <span invisible="not x_has_technical_specs" class="text-success ms-2">
+                                <i class="fa fa-check-circle"/> Especificaciones creadas
+                            </span>
+                        </div>
+                    </group>
+                </page>
+                
+                <!-- Suppliers Tab -->
+                <page string="Proveedores" invisible="not x_is_request" name="suppliers_info">
+                    <group string="Proveedores Sugeridos (Basado en Tags)" invisible="not x_suggested_supplier_ids">
+                        <field name="x_suggested_supplier_ids" nolabel="1">
+                            <kanban>
+                                <field name="name"/>
+                                <field name="x_supplier_rating"/>
+                                <field name="x_china_province"/>
+                                <field name="x_tag_count"/>
+                                <templates>
+                                    <t t-name="kanban-box">
+                                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill oe_kanban_card">
+                                            <div class="oe_kanban_details">
+                                                <strong class="o_kanban_record_title">
+                                                    <field name="name"/>
+                                                </strong>
+                                                <div>
+                                                    <span class="text-muted">
+                                                        <i class="fa fa-map-marker"/> <field name="x_china_province"/>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    Rating: <field name="x_supplier_rating"/> / 5.0
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </group>
+                    
+                    <group string="Proveedores Potenciales">
+                        <field name="x_potential_supplier_ids" nolabel="1" 
+                               widget="many2many_tags"
+                               options="{'no_create': True}"
+                               domain="[('x_is_china_supplier', '=', True)]"/>
+                    </group>
+                    
+                    <group string="Proveedor Seleccionado" invisible="not x_selected_supplier_id">
+                        <field name="x_selected_supplier_id" 
+                               domain="[('id', 'in', x_potential_supplier_ids)]"
+                               options="{'no_create': True}"/>
+                    </group>
+                </page>
+                
+                <!-- Quotations Tab -->
+                <page string="Cotizaciones" invisible="not x_is_evaluation" name="quotations_info">
+                    <button name="action_create_quotation" 
+                            type="object" 
+                            string="Nueva Cotización" 
+                            class="btn-primary mb-2"/>
+                    <field name="x_quotation_line_ids">
+                        <list string="Cotizaciones" 
+                              default_order="supplier_id,sequence"
+                              decoration-success="is_selected==True"
+                              decoration-muted="state=='rejected'">
+                            <field name="sequence" widget="handle"/>
+                            <field name="supplier_id"/>
+                            <field name="product_name"/>
+                            <field name="quantity"/>
+                            <field name="price_unit"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="price_total" sum="Total"/>
+                            <field name="delivery_term"/>
+                            <field name="lead_time"/>
+                            <field name="state" widget="badge" 
+                                   decoration-success="state=='selected'"
+                                   decoration-info="state=='received'"
+                                   decoration-warning="state=='sent'"/>
+                            <field name="is_selected" invisible="1"/>
+                            <button name="action_select_quotation" 
+                                    type="object" 
+                                    string="Seleccionar" 
+                                    class="btn-success"
+                                    invisible="state not in ['received'] or is_selected"/>
+                        </list>
+                    </field>
+                </page>
+                
+                <!-- Purchase Status Tab -->
+                <page string="Estado de Compra" invisible="not x_is_evaluation" name="purchase_status">
+                    <group>
+                        <group string="Aprobación">
+                            <field name="x_approval_status" widget="selection_badge"/>
+                            <button name="action_approve_request" 
+                                    type="object" 
+                                    string="Aprobar" 
+                                    class="btn-success"
+                                    invisible="x_approval_status != 'pending'"/>
+                            <button name="action_reject_request" 
+                                    type="object" 
+                                    string="Rechazar" 
+                                    class="btn-danger"
+                                    invisible="x_approval_status != 'pending'"/>
+                        </group>
+                        <group string="Orden de Compra">
+                            <field name="x_is_purchased"/>
+                            <field name="x_purchase_order_id" 
+                                   invisible="not x_purchase_order_id"
+                                   readonly="1"/>
+                            <button name="action_create_purchase_order" 
+                                    type="object" 
+                                    string="Crear Orden de Compra" 
+                                    class="btn-primary"
+                                    invisible="x_is_purchased or not x_selected_supplier_id or x_approval_status != 'approved'"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            
+        </field>
+    </record>
+    
+    <!-- Task List View - Inherit and Extend -->
+    <record id="view_project_task_list_xportem" model="ir.ui.view">
+        <field name="name">project.task.list.xportem</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="arch" type="xml">
+            
+            <!-- Add procurement fields -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="x_product_display_name" string="Producto" optional="show"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='user_ids']" position="after">
+                <field name="x_urgency" widget="badge" 
+                       decoration-danger="x_urgency=='critical'"
+                       decoration-warning="x_urgency=='urgent'"
+                       optional="show"/>
+                <field name="x_selected_supplier_id" optional="show"/>
+                <field name="x_is_purchased" widget="boolean_toggle" optional="show"/>
+            </xpath>
+            
+        </field>
+    </record>
+    
+    <!-- Task Kanban View - Inherit and Extend (SIMPLIFIED) -->
+    <record id="view_project_task_kanban_xportem" model="ir.ui.view">
+        <field name="name">project.task.kanban.xportem</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_kanban"/>
+        <field name="arch" type="xml">
+            
+            <!-- Only add the fields to make them available -->
+            <xpath expr="//kanban" position="inside">
+                <field name="x_product_display_name"/>
+                <field name="x_urgency"/>
+                <field name="x_is_purchased"/>
+            </xpath>
+            
+        </field>
+    </record>
+    
+    <!-- Search View for Tasks -->
+    <record id="view_project_task_search_xportem" model="ir.ui.view">
+        <field name="name">project.task.search.xportem</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Add search fields -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="x_product_display_name" string="Producto"
+                       filter_domain="['|', ('x_product_name_free', 'ilike', self), ('x_product_id', 'ilike', self)]"/>
+                <field name="x_product_tags"/>
+                <field name="x_selected_supplier_id"/>
+            </xpath>
+            
+            <!-- Add filters -->
+            <xpath expr="//filter[@name='my_tasks']" position="after">
+                <separator/>
+                <filter string="Solicitudes" name="is_request"
+                        domain="[('x_is_request', '=', True)]"/>
+                <filter string="En Evaluación" name="is_evaluation"
+                        domain="[('x_is_evaluation', '=', True)]"/>
+                <filter string="Urgentes" name="urgent"
+                        domain="[('x_urgency', 'in', ['urgent', 'critical'])]"/>
+                <filter string="Compradas" name="purchased"
+                        domain="[('x_is_purchased', '=', True)]"/>
+                <filter string="Sin Comprar" name="not_purchased"
+                        domain="[('x_is_purchased', '=', False)]"/>
+            </xpath>
+            
+            <!-- Add groupby in the existing group -->
+            <xpath expr="//filter[@name='stage']" position="after">
+                <filter string="Urgencia" name="group_urgency"
+                        context="{'group_by': 'x_urgency'}"/>
+                <filter string="Categoría" name="group_category"
+                        context="{'group_by': 'x_category_id'}"/>
+                <filter string="Proveedor" name="group_supplier"
+                        context="{'group_by': 'x_selected_supplier_id'}"/>
+                <filter string="Estado Aprobación" name="group_approval"
+                        context="{'group_by': 'x_approval_status'}"/>
+            </xpath>
+            
+        </field>
+    </record>
+    
+</odoo>

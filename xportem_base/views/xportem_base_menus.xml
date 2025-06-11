@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Main Menu: Xportem -->
+    <menuitem id="menu_xportem_root"
+              name="Xportem"
+              sequence="5"
+              web_icon="xportem_base,static/description/icon.png"/>
+    
+    <!-- Second Level Menu: Configuration -->
+    <menuitem id="menu_xportem_configuration"
+              name="Configuración"
+              parent="menu_xportem_root"
+              sequence="90"/>
+    
+    <!-- Third Level Menu: Master Data -->
+    <menuitem id="menu_xportem_master_data"
+              name="Datos Maestros"
+              parent="menu_xportem_configuration"
+              sequence="10"/>
+    
+    <!-- Menu Items for Master Data -->
+    <menuitem id="menu_procurement_category"
+              name="Categorías de Productos"
+              parent="menu_xportem_master_data"
+              action="action_procurement_category"
+              sequence="10"/>
+    
+    <menuitem id="menu_procurement_tag"
+              name="Etiquetas de Procura"
+              parent="menu_xportem_master_data"
+              action="action_procurement_tag"
+              sequence="20"/>
+    
+    <menuitem id="menu_procurement_certification"
+              name="Certificaciones"
+              parent="menu_xportem_master_data"
+              action="action_procurement_certification"
+              sequence="30"/>
+    
+</odoo>

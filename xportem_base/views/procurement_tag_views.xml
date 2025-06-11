@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Procurement Tag Search View -->
+    <record id="view_procurement_tag_search" model="ir.ui.view">
+        <field name="name">procurement.tag.search</field>
+        <field name="model">procurement.tag</field>
+        <field name="arch" type="xml">
+            <search string="Search Procurement Tags">
+                <field name="name" string="Tag" 
+                       filter_domain="['|', '|', '|', 
+                                      ('name', 'ilike', self), 
+                                      ('code', 'ilike', self),
+                                      ('alternative_names', 'ilike', self),
+                                      ('keywords', 'ilike', self)]"/>
+                <field name="category_id"/>
+                <field name="parent_id"/>
+                <separator/>
+                <filter string="Top Level" name="top_level" 
+                        domain="[('parent_id', '=', False)]"/>
+                <filter string="Active" name="active" 
+                        domain="[('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" 
+                        domain="[('active', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_category" 
+                            context="{'group_by': 'category_id'}"/>
+                    <filter string="Parent Tag" name="group_parent" 
+                            context="{'group_by': 'parent_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Procurement Tag Action -->
+    <record id="action_procurement_tag" model="ir.actions.act_window">
+        <field name="name">Procurement Tags</field>
+        <field name="res_model">procurement.tag</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_procurement_tag_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first procurement tag
+            </p>
+            <p>
+                Tags help identify and classify specific products or product types.
+                You can create hierarchical tags and add alternative names to improve
+                search capabilities.
+            </p>
+        </field>
+    </record>
+
+    <!-- Procurement Tag List View -->
+    <record id="view_procurement_tag_list" model="ir.ui.view">
+        <field name="name">procurement.tag.list</field>
+        <field name="model">procurement.tag</field>
+        <field name="arch" type="xml">
+            <list string="Procurement Tags" default_order="sequence, complete_name">
+                <field name="sequence" widget="handle"/>
+                <field name="complete_name"/>
+                <field name="code"/>
+                <field name="category_id"/>
+                <field name="parent_id"/>
+                <field name="active" invisible="1"/>
+                <field name="child_count" string="Sub-tags"/>
+                <field name="color" invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Procurement Tag Form View -->
+    <record id="view_procurement_tag_form" model="ir.ui.view">
+        <field name="name">procurement.tag.form</field>
+        <field name="model">procurement.tag</field>
+        <field name="arch" type="xml">
+            <form string="Procurement Tag">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_procurement_tag)d" 
+                                type="action" 
+                                class="oe_stat_button" 
+                                icon="fa-tags"
+                                invisible="child_count == 0"
+                                context="{'default_parent_id': id}">
+
+                            <field name="child_count" widget="statinfo" string="Sub-tags"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Tag Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Stainless Steel, Gate Valve"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="e.g. SS304"/>
+                            <field name="parent_id" options="{'no_create': True}"/>
+                            <field name="category_id" options="{'no_create': True}"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="color" widget="color"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Search Enhancement">
+                            <group>
+                                <field name="alternative_names" nolabel="1" 
+                                       placeholder="Alternative names or synonyms, separated by commas&#10;e.g. stainless steel, inox, acero inoxidable"/>
+                                <field name="keywords" nolabel="1" 
+                                       placeholder="Additional keywords to help find this tag in searches"/>
+                            </group>
+                        </page>
+                        <page string="Description">
+                            <field name="description" nolabel="1" 
+                                   placeholder="Describe what products are covered by this tag..."/>
+                        </page>
+                        <page string="Sub-tags" invisible="child_count == 0">
+                            <field name="child_ids" context="{'default_parent_id': id}">
+                                <list string="Sub-tags" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Procurement Tag Kanban View -->
+    <record id="view_procurement_tag_kanban" model="ir.ui.view">
+        <field name="name">procurement.tag.kanban</field>
+        <field name="model">procurement.tag</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="color"/>
+                <field name="complete_name"/>
+                <field name="supplier_count"/>
+                <field name="project_count"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="complete_name"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span t-if="record.code.raw_value" class="badge badge-pill">
+                                            <t t-esc="record.code.value"/>
+                                        </span>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <span t-if="record.supplier_count.raw_value > 0" 
+                                              class="badge badge-secondary">
+                                            <i class="fa fa-building-o" aria-label="Suppliers"/>
+                                            <t t-esc="record.supplier_count.value"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Procurement Tag Action -->
+    <record id="action_procurement_tag" model="ir.actions.act_window">
+        <field name="name">Procurement Tags</field>
+        <field name="res_model">procurement.tag</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_procurement_tag_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first procurement tag
+            </p>
+            <p>
+                Tags help identify and classify specific products or product types.
+                You can create hierarchical tags and add alternative names to improve
+                search capabilities.
+            </p>
+        </field>
+    </record>
+
+</odoo>

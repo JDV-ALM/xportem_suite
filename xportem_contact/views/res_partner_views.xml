@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Search Views First (no dependencies) -->
+    
+    <!-- Search View for China Suppliers -->
+    <record id="view_china_supplier_search" model="ir.ui.view">
+        <field name="name">res.partner.china.supplier.search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Proveedores China">
+                <field name="name" string="Proveedor"
+                       filter_domain="['|', '|', '|',
+                                      ('name', 'ilike', self),
+                                      ('x_china_company_name', 'ilike', self),
+                                      ('x_wechat_id', 'ilike', self),
+                                      ('x_main_products', 'ilike', self)]"/>
+                <field name="x_product_tags"/>
+                <field name="x_product_categories"/>
+                <field name="x_china_province"/>
+                <field name="x_certifications"/>
+                
+                <filter string="Configurados" name="configured"
+                        domain="[('x_is_china_configured', '=', True)]"/>
+                <filter string="Alta Calificación" name="high_rating"
+                        domain="[('x_supplier_rating', '>=', 4)]"/>
+                <filter string="Con Certificaciones" name="with_certifications"
+                        domain="[('x_certifications', '!=', False)]"/>
+                
+                <separator/>
+                
+                <filter string="Fábrica Pequeña" name="small_factory"
+                        domain="[('x_factory_size', '=', 'small')]"/>
+                <filter string="Fábrica Mediana" name="medium_factory"
+                        domain="[('x_factory_size', '=', 'medium')]"/>
+                <filter string="Fábrica Grande" name="large_factory"
+                        domain="[('x_factory_size', '=', 'large')]"/>
+                
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Provincia" name="group_province"
+                            context="{'group_by': 'x_china_province'}"/>
+                    <filter string="Tamaño de Fábrica" name="group_factory_size"
+                            context="{'group_by': 'x_factory_size'}"/>
+                    <filter string="Calificación" name="group_rating"
+                            context="{'group_by': 'x_supplier_rating'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Search View for Procurement Clients -->
+    <record id="view_procurement_client_search" model="ir.ui.view">
+        <field name="name">res.partner.procurement.client.search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Clientes de Procura">
+                <field name="name" string="Cliente"
+                       filter_domain="['|', '|',
+                                      ('name', 'ilike', self),
+                                      ('x_client_code', 'ilike', self),
+                                      ('x_rif', 'ilike', self)]"/>
+                <field name="x_client_code"/>
+                <field name="x_rif"/>
+                <field name="city"/>
+                <field name="country_id"/>
+                
+                <filter string="Activos" name="active"
+                        domain="[('active', '=', True)]"/>
+                
+                <group expand="0" string="Agrupar Por">
+                    <filter string="País" name="group_country"
+                            context="{'group_by': 'country_id'}"/>
+                    <filter string="Ciudad" name="group_city"
+                            context="{'group_by': 'city'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- List Views (no action dependencies) -->
+    
+    <!-- List View for China Suppliers -->
+    <record id="view_china_supplier_list" model="ir.ui.view">
+        <field name="name">res.partner.china.supplier.list</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="Proveedores China" default_order="x_supplier_rating desc">
+                <field name="name"/>
+                <field name="x_china_province"/>
+                <field name="x_china_city"/>
+                <field name="x_product_tags" widget="many2many_tags"/>
+                <field name="x_supplier_rating" widget="float" digits="[3,2]"/>
+                <field name="x_evaluation_date"/>
+                <field name="x_factory_size"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- List View for Procurement Clients -->
+    <record id="view_procurement_client_list" model="ir.ui.view">
+        <field name="name">res.partner.procurement.client.list</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="Clientes de Procura" default_order="x_client_code">
+                <field name="x_client_code"/>
+                <field name="name"/>
+                <field name="x_rif"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="city"/>
+                <field name="country_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- List View for Client Users -->
+    <record id="view_client_user_list" model="ir.ui.view">
+        <field name="name">res.partner.client.user.list</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="Usuarios de Cliente" default_order="x_parent_client_id,x_client_role">
+                <field name="name"/>
+                <field name="x_parent_client_id"/>
+                <field name="x_client_role"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="user_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View for China Suppliers -->
+    <record id="view_china_supplier_kanban" model="ir.ui.view">
+        <field name="name">res.partner.china.supplier.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_order="x_supplier_rating desc">
+                <field name="name"/>
+                <field name="x_china_province"/>
+                <field name="x_china_city"/>
+                <field name="x_supplier_rating"/>
+                <field name="x_product_tags"/>
+                <field name="x_tag_count"/>
+                <field name="x_certification_count"/>
+                <field name="image_128"/>
+                <field name="is_company"/>
+                <field name="x_is_china_configured"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                            <div class="o_kanban_image_fill_left d-none d-md-block"
+                                 t-attf-style="background-image:url('#{kanban_image('res.partner', 'image_128', record.id.raw_value)}')">
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div class="o_kanban_tags_section">
+                                    <field name="x_product_tags" widget="many2many_tags"/>
+                                </div>
+                                <ul>
+                                    <li t-if="record.x_china_province.raw_value">
+                                        <i class="fa fa-map-marker"/> 
+                                        <field name="x_china_province"/> - <field name="x_china_city"/>
+                                    </li>
+                                    <li>
+                                        Rating: <field name="x_supplier_rating"/> / 5.0
+                                    </li>
+                                    <li t-if="record.x_tag_count.raw_value > 0">
+                                        <i class="fa fa-tags"/> 
+                                        <field name="x_tag_count"/> Productos
+                                    </li>
+                                    <li t-if="record.x_certification_count.raw_value > 0">
+                                        <i class="fa fa-certificate"/> 
+                                        <field name="x_certification_count"/> Certificaciones
+                                    </li>
+                                </ul>
+                                <div class="oe_kanban_bottom_right">
+                                    <span t-if="record.x_is_china_configured.raw_value" 
+                                          class="badge badge-success">Configurado</span>
+                                    <span t-else="" class="badge badge-warning">Incompleto</span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Actions (depend on search views) -->
+    
+    <record id="action_china_suppliers" model="ir.actions.act_window">
+        <field name="name">Proveedores China</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('x_is_china_supplier', '=', True)]</field>
+        <field name="context">{'default_x_is_china_supplier': True, 'default_is_company': True}</field>
+        <field name="search_view_id" ref="view_china_supplier_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un nuevo proveedor de China
+            </p>
+            <p>
+                Configure proveedores chinos con información de contacto WeChat,
+                ubicación, productos que venden y certificaciones.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_procurement_clients" model="ir.actions.act_window">
+        <field name="name">Clientes de Procura</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('x_is_procurement_client', '=', True)]</field>
+        <field name="context">{'default_x_is_procurement_client': True, 'default_is_company': True}</field>
+        <field name="search_view_id" ref="view_procurement_client_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un nuevo cliente de procura
+            </p>
+            <p>
+                Configure clientes del servicio de procura con código único,
+                RIF y usuarios asociados con roles específicos.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_client_users" model="ir.actions.act_window">
+        <field name="name">Usuarios de Cliente</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('x_client_role', '!=', False)]</field>
+        <field name="context">{'default_is_company': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un nuevo usuario de cliente
+            </p>
+            <p>
+                Configure usuarios con roles específicos asociados a empresas clientes.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action View Links (depend on actions and views) -->
+    
+    <record id="action_china_suppliers_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_china_supplier_kanban"/>
+        <field name="act_window_id" ref="action_china_suppliers"/>
+    </record>
+
+    <record id="action_china_suppliers_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_china_supplier_list"/>
+        <field name="act_window_id" ref="action_china_suppliers"/>
+    </record>
+
+    <record id="action_procurement_clients_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_procurement_client_list"/>
+        <field name="act_window_id" ref="action_procurement_clients"/>
+    </record>
+
+    <record id="action_client_users_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_client_user_list"/>
+        <field name="act_window_id" ref="action_client_users"/>
+    </record>
+
+    <!-- Form View Inheritance (depends on actions for buttons) -->
+    
+    <record id="view_partner_form_xportem" model="ir.ui.view">
+        <field name="name">res.partner.form.xportem</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Add invisible fields for computed values -->
+            <xpath expr="//sheet" position="inside">
+                <field name="x_tag_count" invisible="1"/>
+                <field name="x_certification_count" invisible="1"/>
+            </xpath>
+            
+            <!-- Add checkboxes after title -->
+            <xpath expr="//div[hasclass('oe_title')]" position="after">
+                <group col="4">
+                    <field name="x_is_china_supplier" widget="boolean_toggle"/>
+                    <field name="x_is_procurement_client" widget="boolean_toggle"/>
+                </group>
+            </xpath>
+            
+            <!-- Add stat buttons -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" icon="fa-tags" 
+                        invisible="not x_is_china_supplier"
+                        type="action" name="%(action_china_suppliers)d">
+                    <field name="x_tag_count" widget="statinfo" string="Productos"/>
+                </button>
+                <button class="oe_stat_button" icon="fa-certificate"
+                        invisible="not x_is_china_supplier"
+                        type="action" name="%(action_china_suppliers)d">
+                    <field name="x_certification_count" widget="statinfo" string="Certificaciones"/>
+                </button>
+            </xpath>
+            
+            <!-- Add notebook pages -->
+            <xpath expr="//notebook" position="inside">
+                <!-- China Supplier Tab -->
+                <page string="Información China" invisible="not x_is_china_supplier">
+                    <group>
+                        <group string="Información Básica">
+                            <field name="x_wechat_id"/>
+                            <field name="x_china_company_name"/>
+                            <field name="x_china_province"/>
+                            <field name="x_china_city"/>
+                            <field name="x_factory_size"/>
+                        </group>
+                        <group string="Evaluación">
+                            <field name="x_supplier_rating" widget="float" digits="[3,2]"/>
+                            <field name="x_evaluation_date"/>
+                            <field name="x_is_china_configured" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Productos y Certificaciones">
+                        <field name="x_product_categories" widget="many2many_tags"/>
+                        <field name="x_product_tags" widget="many2many_tags"
+                               context="{'default_active': True}"/>
+                        <field name="x_certifications" widget="many2many_tags"/>
+                    </group>
+                    
+                    <group string="Descripción de Productos">
+                        <field name="x_main_products" nolabel="1" 
+                               placeholder="Describa los principales productos que maneja este proveedor..."/>
+                    </group>
+                </page>
+                
+                <!-- Procurement Client Tab -->
+                <page string="Información Cliente" invisible="not x_is_procurement_client">
+                    <group>
+                        <group string="Datos del Cliente">
+                            <field name="x_client_code" readonly="1"/>
+                            <field name="x_rif"/>
+                        </group>
+                        <group string="Usuario">
+                            <field name="x_client_role"/>
+                            <field name="x_parent_client_id"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

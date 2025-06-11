@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Action for Procurement Projects (defined first) -->
+    <record id="action_procurement_projects" model="ir.actions.act_window">
+        <field name="name">Clientes de Procura</field>
+        <field name="res_model">project.project</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{
+            'default_partner_id': False,
+            'search_default_my_projects': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un nuevo proyecto de cliente
+            </p>
+            <p>
+                Cada proyecto representa un cliente de procura.
+                Las solicitudes de productos se gestionan como tareas dentro del proyecto.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Project Form View - Inherit and Extend -->
+    <record id="view_project_project_form_xportem" model="ir.ui.view">
+        <field name="name">project.project.form.xportem</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            
+            <!-- Add client code after name -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="x_client_code" invisible="not partner_id"/>
+            </xpath>
+            
+            <!-- Add stat buttons -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_active_requests" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-clock-o">
+                    <field name="x_active_requests" widget="statinfo" string="Activas"/>
+                </button>
+                <button name="action_view_all_requests" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-list">
+                    <field name="x_total_requests" widget="statinfo" string="Total"/>
+                </button>
+                <button class="oe_stat_button" icon="fa-line-chart">
+                    <field name="x_avg_cycle_time" widget="statinfo" string="Días Promedio"/>
+                </button>
+            </xpath>
+            
+            <!-- Add procurement tab -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Métricas de Procura">
+                    <group>
+                        <group string="Estadísticas">
+                            <field name="x_total_requests"/>
+                            <field name="x_active_requests"/>
+                            <field name="x_completed_requests"/>
+                        </group>
+                        <group string="Rendimiento">
+                            <field name="x_avg_cycle_time" widget="float_time"/>
+                            <field name="x_total_savings" widget="monetary"/>
+                        </group>
+                    </group>
+                    <group string="Configuración">
+                        <field name="x_auto_create_stages"/>
+                    </group>
+                </page>
+            </xpath>
+            
+            <!-- Override partner domain to only show procurement clients -->
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="domain">[('x_is_procurement_client', '=', True)]</attribute>
+                <attribute name="context">{'default_x_is_procurement_client': True}</attribute>
+            </xpath>
+            
+        </field>
+    </record>
+    
+    <!-- Project List View - Inherit and Extend -->
+    <record id="view_project_project_list_xportem" model="ir.ui.view">
+        <field name="name">project.project.list.xportem</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project"/>
+        <field name="arch" type="xml">
+            
+            <!-- Add metrics columns -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="x_client_code" optional="show"/>
+                <field name="x_active_requests" string="Activas" optional="show"/>
+                <field name="x_total_requests" string="Total" optional="show"/>
+                <field name="x_avg_cycle_time" string="Días Prom." widget="float_time" optional="hide"/>
+            </xpath>
+            
+        </field>
+    </record>
+    
+    <!-- Project Kanban View - Inherit and Extend (SIMPLIFIED) -->
+    <record id="view_project_project_kanban_xportem" model="ir.ui.view">
+        <field name="name">project.project.kanban.xportem</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="arch" type="xml">
+            
+            <!-- Only add procurement fields to be available in kanban -->
+            <xpath expr="//kanban" position="inside">
+                <field name="x_client_code"/>
+                <field name="x_active_requests"/>
+                <field name="x_total_requests"/>
+            </xpath>
+            
+        </field>
+    </record>
+    
+    <!-- Search View for Projects -->
+    <record id="view_project_project_search_xportem" model="ir.ui.view">
+        <field name="name">project.project.search.xportem</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_project_filter"/>
+        <field name="arch" type="xml">
+            
+            <!-- Add groupby only (removed filters that use non-searchable fields) -->
+            <xpath expr="//group" position="inside">
+                <filter string="Código Cliente" name="group_client_code"
+                        context="{'group_by': 'x_client_code'}"/>
+            </xpath>
+            
+        </field>
+    </record>
+    
+</odoo>

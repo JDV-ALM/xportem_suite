@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_project_task_quotation_line_user,project.task.quotation.line.user,model_project_task_quotation_line,base.group_user,1,1,1,1
+access_project_task_quotation_line_portal,project.task.quotation.line.portal,model_project_task_quotation_line,base.group_portal,1,0,0,0
+access_project_task_technical_specs_user,project.task.technical.specs.user,model_project_task_technical_specs,base.group_user,1,1,1,1
+access_project_task_technical_specs_portal,project.task.technical.specs.portal,model_project_task_technical_specs,base.group_portal,1,0,0,0

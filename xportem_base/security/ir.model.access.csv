@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_procurement_category_all,procurement.category.all,model_procurement_category,,1,1,1,1
+access_procurement_tag_all,procurement.tag.all,model_procurement_tag,,1,1,1,1
+access_procurement_certification_all,procurement.certification.all,model_procurement_certification,,1,1,1,1

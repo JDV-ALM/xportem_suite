@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Sequence for Procurement Requests -->
+        <record id="sequence_procurement_request" model="ir.sequence">
+            <field name="name">Procurement Request</field>
+            <field name="code">procurement.request</field>
+            <field name="prefix">SOL-%(year)s-</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+            <field name="use_date_range">True</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+        
+        <!-- Sequence for Procurement Categories -->
+        <record id="sequence_procurement_category" model="ir.sequence">
+            <field name="name">Procurement Category</field>
+            <field name="code">procurement.category</field>
+            <field name="prefix">CAT-</field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+        
+        <!-- Sequence for Procurement Tags -->
+        <record id="sequence_procurement_tag" model="ir.sequence">
+            <field name="name">Procurement Tag</field>
+            <field name="code">procurement.tag</field>
+            <field name="prefix">TAG-</field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+        
+        <!-- Sequence for Procurement Certifications -->
+        <record id="sequence_procurement_certification" model="ir.sequence">
+            <field name="name">Procurement Certification</field>
+            <field name="code">procurement.certification</field>
+            <field name="prefix">CERT-</field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+        
+    </data>
+</odoo>
