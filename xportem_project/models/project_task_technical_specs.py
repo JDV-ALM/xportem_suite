@@ -7,7 +7,6 @@ class ProjectTaskTechnicalSpecs(models.Model):
     _name = 'project.task.technical.specs'
     _description = 'Especificaciones Técnicas del Producto'
     _rec_name = 'product_name'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
     
     # ===== Relación con Tarea =====
     task_id = fields.Many2one(
@@ -22,19 +21,16 @@ class ProjectTaskTechnicalSpecs(models.Model):
     product_name = fields.Char(
         string='Nombre del Producto',
         required=True,
-        tracking=True,
         help='Nombre comercial/técnico del producto'
     )
     
     detailed_description = fields.Text(
         string='Descripción Detallada',
-        tracking=True,
         help='Función, características principales'
     )
     
     quantity_required = fields.Float(
         string='Cantidad Requerida',
-        tracking=True,
         help='Cantidad que se requiere del producto'
     )
     
@@ -44,7 +40,7 @@ class ProjectTaskTechnicalSpecs(models.Model):
         ('material', 'Material'),
         ('instrument', 'Instrumento'),
         ('other', 'Otro')
-    ], string='Categoría del Producto', default='equipment', tracking=True)
+    ], string='Categoría del Producto', default='equipment')
     
     # ===== Caso de Uso y Aplicación =====
     specific_application = fields.Text(
@@ -66,7 +62,7 @@ class ProjectTaskTechnicalSpecs(models.Model):
         ('critical', 'Crítico para operación'),
         ('important', 'Importante'),
         ('spare', 'Repuesto')
-    ], string='Criticidad', default='important', tracking=True)
+    ], string='Criticidad', default='important')
     
     # ===== Características Dimensionales =====
     length = fields.Float(
