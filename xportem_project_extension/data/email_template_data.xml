@@ -59,8 +59,7 @@
     ${object.create_uid.name}<br/>
     ${object.create_uid.company_id.name}</p>
 </div>
-]]>
-            </field>
+]]></field>
         </record>
         
         <!-- Email Template for Sample Received -->
@@ -105,8 +104,7 @@
     ${user.name}<br/>
     ${user.company_id.name}</p>
 </div>
-]]>
-            </field>
+]]></field>
         </record>
         
     </data>
