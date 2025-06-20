@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Contract Report -->
+    <report id="report_task_contract"
+            model="project.task.contract"
+            string="Contract Summary"
+            report_type="qweb-pdf"
+            name="xportem_project_extension.report_contract_document"
+            file="xportem_project_extension.report_contract_document"
+            print_report_name="'Contract - %s' % (object.contract_reference)"
+    />
+    
+    <!-- Contract Report Template -->
+    <template id="report_contract_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Header -->
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h2>CONTRACT SUMMARY</h2>
+                                <h3><t t-esc="doc.contract_reference"/></h3>
+                            </div>
+                        </div>
+                        
+                        <!-- Contract Information -->
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <h4>Contract Details</h4>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Contract Date:</strong></td>
+                                        <td><span t-field="doc.contract_date"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Supplier:</strong></td>
+                                        <td><span t-field="doc.supplier_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Status:</strong></td>
+                                        <td>
+                                            <span t-field="doc.state" 
+                                                  t-options='{"widget": "badge"}'/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <h4>Financial Information</h4>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Contract Amount:</strong></td>
+                                        <td>
+                                            <span t-field="doc.contract_amount" 
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Currency:</strong></td>
+                                        <td><span t-field="doc.currency_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Purchase Order:</strong></td>
+                                        <td><span t-field="doc.purchase_order_id.name" t-if="doc.purchase_order_id"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Product Information -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4>Product Information</h4>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td width="30%"><strong>Task/Product:</strong></td>
+                                        <td><span t-field="doc.task_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Product Name:</strong></td>
+                                        <td><span t-field="doc.product_display_name"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Delivery Terms -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4>Delivery Information</h4>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td width="30%"><strong>Delivery Terms:</strong></td>
+                                        <td><span t-field="doc.delivery_terms"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Expected Delivery:</strong></td>
+                                        <td><span t-field="doc.expected_delivery_date"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Terms -->
+                        <div class="row mt-4" t-if="doc.payment_terms">
+                            <div class="col-12">
+                                <h4>Payment Terms</h4>
+                                <p style="white-space: pre-wrap;"><t t-esc="doc.payment_terms"/></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Invoice Information -->
+                        <div class="row mt-4" t-if="doc.has_invoice">
+                            <div class="col-12">
+                                <h4>Invoice Information</h4>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td width="30%"><strong>Invoice Number:</strong></td>
+                                        <td><span t-field="doc.invoice_number"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Invoice Date:</strong></td>
+                                        <td><span t-field="doc.invoice_date"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Invoice Amount:</strong></td>
+                                        <td>
+                                            <span t-field="doc.invoice_amount" 
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Notes -->
+                        <div class="row mt-4" t-if="doc.notes">
+                            <div class="col-12">
+                                <h4>Additional Notes</h4>
+                                <p style="white-space: pre-wrap;"><t t-esc="doc.notes"/></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Document Status -->
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td class="text-center" width="50%">
+                                            <strong>Contract File:</strong>
+                                            <t t-if="doc.contract_file">
+                                                <i class="fa fa-check text-success"/> Uploaded
+                                            </t>
+                                            <t t-else="">
+                                                <i class="fa fa-times text-danger"/> Not Uploaded
+                                            </t>
+                                        </td>
+                                        <td class="text-center" width="50%">
+                                            <strong>Invoice File:</strong>
+                                            <t t-if="doc.invoice_file">
+                                                <i class="fa fa-check text-success"/> Uploaded
+                                            </t>
+                                            <t t-else="">
+                                                <i class="fa fa-times text-danger"/> Not Uploaded
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="row mt-5">
+                            <div class="col-12 text-center text-muted">
+                                <small>
+                                    Report generated on <span t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    
+</odoo>

@@ -10,6 +10,7 @@
             
             <!-- Add invisible fields -->
             <xpath expr="//sheet//group[@invisible='1']" position="inside">
+                <field name="currency_id" invisible="1"/>
                 <field name="sample_count"/>
                 <field name="active_sample_count"/>
                 <field name="contract_count"/>
@@ -109,12 +110,12 @@
                                                         <field name="supplier_id"/>
                                                     </span>
                                                 </div>
-                                                <field name="state" widget="label_selection" 
-                                                       options="{'classes': {'draft': 'secondary', 
-                                                                           'requested': 'warning', 
-                                                                           'in_transit': 'info',
-                                                                           'received': 'success',
-                                                                           'cancelled': 'danger'}}"/>
+                                                <field name="state" widget="badge" 
+                                                       decoration-secondary="state == 'draft'"
+                                                       decoration-warning="state == 'requested'"
+                                                       decoration-info="state == 'in_transit'"
+                                                       decoration-success="state == 'received'"
+                                                       decoration-danger="state == 'cancelled'"/>
                                             </div>
                                             <div class="o_kanban_record_body mt-2">
                                                 <div t-if="record.current_location_id.raw_value">
@@ -125,11 +126,11 @@
                                                     <strong>Cost: </strong>
                                                     <field name="total_cost" widget="monetary"/>
                                                     <span t-if="record.payment_state.raw_value == 'pending'" 
-                                                          class="badge badge-warning ms-2">
+                                                          class="badge badge-warning ml-2">
                                                         <i class="fa fa-clock-o"/> Pending Payment
                                                     </span>
                                                     <span t-if="record.payment_state.raw_value == 'paid'" 
-                                                          class="badge badge-success ms-2">
+                                                          class="badge badge-success ml-2">
                                                         <i class="fa fa-check"/> Paid
                                                     </span>
                                                 </div>
@@ -174,7 +175,10 @@
                             <field name="currency_id" groups="base.group_multi_currency"/>
                             <field name="has_invoice" string="Factura"/>
                             <field name="invoice_number" optional="show"/>
-                            <field name="state" widget="badge"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'completed'"
+                                   decoration-info="state == 'invoiced'"
+                                   decoration-warning="state == 'signed'"/>
                         </list>
                     </field>
                     

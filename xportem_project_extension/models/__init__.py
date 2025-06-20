@@ -10,3 +10,6 @@ from . import project_task_sample
 from . import project_task_sample_tracking
 from . import project_task_contract
 from . import project_task
+
+# Wizards
+from . import project_task_sample_wizard

@@ -225,7 +225,7 @@
         </field>
     </record>
     
-    <!-- Sample Search View -->
+    <!-- Sample Search View - UPDATED -->
     <record id="view_project_task_sample_search" model="ir.ui.view">
         <field name="name">project.task.sample.search</field>
         <field name="model">project.task.sample</field>
@@ -245,8 +245,17 @@
                 <separator/>
                 <filter string="Has Cost" name="has_cost"
                         domain="[('has_cost', '=', True)]"/>
-                <filter string="This Month" name="this_month"
-                        domain="[('request_date','&gt;=',(datetime.date.today()-datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <!-- Removed problematic date filter -->
+                <filter string="Current Month" name="current_month"
+                        domain="[
+                            ('request_date', '>=', context_today().replace(day=1).strftime('%Y-%m-%d')),
+                            ('request_date', '&lt;', (context_today().replace(day=1) + relativedelta(months=1)).strftime('%Y-%m-%d'))
+                        ]"/>
+                <filter string="Last Month" name="last_month"
+                        domain="[
+                            ('request_date', '>=', (context_today().replace(day=1) - relativedelta(months=1)).strftime('%Y-%m-%d')),
+                            ('request_date', '&lt;', context_today().replace(day=1).strftime('%Y-%m-%d'))
+                        ]"/>
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter string="Task" name="group_task"

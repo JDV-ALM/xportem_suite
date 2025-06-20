@@ -80,7 +80,7 @@
               parent="xportem_project.menu_xportem_reporting"
               action="action_project_task_sample"
               sequence="30"
-              context="{'search_default_group_supplier': 1, 'search_default_this_month': 1}"/>
+              context="{'search_default_group_supplier': 1}"/>
     
     <!-- Contract Analysis -->
     <menuitem id="menu_contract_analysis"

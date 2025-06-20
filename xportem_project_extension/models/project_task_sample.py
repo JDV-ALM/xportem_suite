@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from datetime import timedelta
 
 
 class ProjectTaskSample(models.Model):
@@ -9,6 +10,7 @@ class ProjectTaskSample(models.Model):
     _description = 'Product Sample Request'
     _order = 'create_date desc, id desc'
     _rec_name = 'reference'
+    _inherit = ['mail.thread', 'mail.activity.mixin']  # Add tracking
     
     # Basic Information
     reference = fields.Char(
@@ -16,7 +18,8 @@ class ProjectTaskSample(models.Model):
         required=True,
         readonly=True,
         default='New',
-        copy=False
+        copy=False,
+        tracking=True
     )
     
     task_id = fields.Many2one(
@@ -24,6 +27,7 @@ class ProjectTaskSample(models.Model):
         string='Related Task',
         required=True,
         ondelete='cascade',
+        index=True,
         help='Task requesting this sample'
     )
     
@@ -32,7 +36,8 @@ class ProjectTaskSample(models.Model):
         string='Sample Provider',
         required=True,
         domain=[('x_is_china_supplier', '=', True)],
-        help='Company sending the sample'
+        help='Company sending the sample',
+        tracking=True
     )
     
     # Sample Details
@@ -53,7 +58,8 @@ class ProjectTaskSample(models.Model):
     request_date = fields.Date(
         string='Request Date',
         default=fields.Date.today,
-        required=True
+        required=True,
+        tracking=True
     )
     
     expected_date = fields.Date(
@@ -63,7 +69,8 @@ class ProjectTaskSample(models.Model):
     
     received_date = fields.Date(
         string='Received Date',
-        help='Actual receipt date at final destination'
+        help='Actual receipt date at final destination',
+        tracking=True
     )
     
     # Cost Information
@@ -75,7 +82,8 @@ class ProjectTaskSample(models.Model):
     sample_cost = fields.Monetary(
         string='Sample Cost',
         currency_field='currency_id',
-        help='Cost of the sample itself'
+        help='Cost of the sample itself',
+        tracking=True
     )
     
     shipping_cost = fields.Monetary(
@@ -109,7 +117,8 @@ class ProjectTaskSample(models.Model):
     current_location_id = fields.Many2one(
         'procurement.sample.location',
         string='Current Location',
-        help='Current location of the sample'
+        help='Current location of the sample',
+        tracking=True
     )
     
     shipping_method_id = fields.Many2one(
@@ -182,6 +191,18 @@ class ProjectTaskSample(models.Model):
         store=False
     )
     
+    days_in_transit = fields.Integer(
+        string='Days in Transit',
+        compute='_compute_transit_days',
+        store=False
+    )
+    
+    is_overdue = fields.Boolean(
+        string='Is Overdue',
+        compute='_compute_overdue',
+        store=False
+    )
+    
     @api.depends('sample_cost', 'shipping_cost')
     def _compute_total_cost(self):
         """Calculate total cost"""
@@ -203,6 +224,33 @@ class ProjectTaskSample(models.Model):
             else:
                 sample.last_status_update = sample.create_date
     
+    @api.depends('request_date', 'received_date', 'state')
+    def _compute_transit_days(self):
+        """Calculate days in transit"""
+        for sample in self:
+            if sample.request_date:
+                if sample.received_date:
+                    delta = sample.received_date - sample.request_date
+                    sample.days_in_transit = delta.days
+                elif sample.state == 'in_transit':
+                    delta = fields.Date.today() - sample.request_date
+                    sample.days_in_transit = delta.days
+                else:
+                    sample.days_in_transit = 0
+            else:
+                sample.days_in_transit = 0
+    
+    @api.depends('expected_date', 'state')
+    def _compute_overdue(self):
+        """Check if sample is overdue"""
+        today = fields.Date.today()
+        for sample in self:
+            sample.is_overdue = bool(
+                sample.expected_date and 
+                sample.expected_date < today and 
+                sample.state not in ['received', 'cancelled']
+            )
+    
     @api.model_create_multi
     def create(self, vals_list):
         """Generate reference on creation"""
@@ -222,34 +270,61 @@ class ProjectTaskSample(models.Model):
             self.shipping_cost = 0.0
     
     def action_request(self):
-        """Mark sample as requested"""
+        """Mark sample as requested and send email"""
         self.ensure_one()
         self.state = 'requested'
+        
         # Create initial tracking
-        self.env['project.task.sample.tracking'].create({
-            'sample_id': self.id,
-            'status_id': self.env['procurement.sample.status'].search([('is_initial', '=', True)], limit=1).id,
-            'date': fields.Datetime.now(),
-            'notes': 'Sample requested from supplier'
-        })
+        initial_status = self.env['procurement.sample.status'].search([('is_initial', '=', True)], limit=1)
+        if initial_status:
+            self.env['project.task.sample.tracking'].create({
+                'sample_id': self.id,
+                'status_id': initial_status.id,
+                'date': fields.Datetime.now(),
+                'notes': 'Sample requested from supplier'
+            })
+        
+        # Send email to supplier
+        template = self.env.ref('xportem_project_extension.email_template_sample_request', False)
+        if template:
+            template.send_mail(self.id, force_send=True)
+        
+        # Create activity for follow-up
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary='Follow up on sample request',
+            date_deadline=fields.Date.today() + timedelta(days=7),
+            user_id=self.env.user.id
+        )
     
     def action_mark_in_transit(self):
         """Mark sample as in transit"""
         self.ensure_one()
+        if not self.shipping_method_id:
+            raise ValidationError(self.env._('Please select a shipping method before marking as in transit.'))
         self.state = 'in_transit'
     
     def action_mark_received(self):
-        """Mark sample as received"""
+        """Mark sample as received and send notification"""
         self.ensure_one()
         self.write({
             'state': 'received',
             'received_date': fields.Date.today()
         })
+        
+        # Mark activities as done
+        self.activity_ids.action_done()
+        
+        # Send notification email
+        template = self.env.ref('xportem_project_extension.email_template_sample_received', False)
+        if template:
+            template.send_mail(self.id, force_send=True)
     
     def action_cancel(self):
         """Cancel sample request"""
         self.ensure_one()
         self.state = 'cancelled'
+        self.activity_ids.action_done()
     
     def action_mark_paid(self):
         """Mark sample as paid"""
@@ -269,6 +344,43 @@ class ProjectTaskSample(models.Model):
             'domain': [('sample_id', '=', self.id)],
             'context': {'default_sample_id': self.id}
         }
+    
+    def action_print_tracking_report(self):
+        """Print tracking report"""
+        self.ensure_one()
+        return self.env.ref('xportem_project_extension.report_sample_tracking').report_action(self)
+    
+    def action_add_tracking_update(self):
+        """Quick add tracking update"""
+        self.ensure_one()
+        return {
+            'name': self.env._('Add Tracking Update'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'project.task.sample.tracking',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_sample_id': self.id,
+                'default_date': fields.Datetime.now(),
+            }
+        }
+    
+    @api.model
+    def check_overdue_samples(self):
+        """Cron method to check overdue samples"""
+        overdue_samples = self.search([
+            ('expected_date', '<', fields.Date.today()),
+            ('state', 'not in', ['received', 'cancelled'])
+        ])
+        
+        for sample in overdue_samples:
+            # Create activity for overdue samples
+            sample.activity_schedule(
+                'mail.mail_activity_data_warning',
+                summary=f'Sample {sample.reference} is overdue',
+                date_deadline=fields.Date.today(),
+                user_id=sample.task_id.user_ids[:1].id or sample.create_uid.id
+            )
     
     def name_get(self):
         """Display name with reference and product"""

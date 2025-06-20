@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Sample Wizard Form View -->
+    <record id="view_project_task_sample_wizard_form" model="ir.ui.view">
+        <field name="name">project.task.sample.wizard.form</field>
+        <field name="model">project.task.sample.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Multiple Sample Requests">
+                <group>
+                    <field name="task_id" readonly="1"/>
+                </group>
+                <group>
+                    <group string="Sample Information">
+                        <field name="sample_description" 
+                               placeholder="Description of the sample..."/>
+                        <field name="quantity"/>
+                        <field name="has_cost"/>
+                        <field name="expected_date"/>
+                    </group>
+                    <group string="Suppliers">
+                        <field name="supplier_ids" widget="many2many_tags"
+                               options="{'no_create': True}"
+                               placeholder="Select suppliers..."/>
+                    </group>
+                </group>
+                <group string="Additional Notes">
+                    <field name="notes" nolabel="1" 
+                           placeholder="Notes that will be added to all samples..."/>
+                </group>
+                <footer>
+                    <button name="action_create_samples" 
+                            string="Create Samples" 
+                            type="object" 
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Sample Wizard Action -->
+    <record id="action_project_task_sample_wizard" model="ir.actions.act_window">
+        <field name="name">Create Multiple Samples</field>
+        <field name="res_model">project.task.sample.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="project.model_project_task"/>
+        <field name="binding_view_types">form</field>
+    </record>
+    
+</odoo>
