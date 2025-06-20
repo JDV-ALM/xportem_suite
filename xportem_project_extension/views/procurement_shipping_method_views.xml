@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Shipping Method List View -->
+    <record id="view_procurement_shipping_method_list" model="ir.ui.view">
+        <field name="name">procurement.shipping.method.list</field>
+        <field name="model">procurement.shipping.method</field>
+        <field name="arch" type="xml">
+            <list string="Shipping Methods" default_order="sequence">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="shipping_type"/>
+                <field name="estimated_days" string="Est. Days"/>
+                <field name="is_express" string="Express"/>
+                <field name="active" invisible="1"/>
+                <field name="sample_count" string="Samples"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Shipping Method Form View -->
+    <record id="view_procurement_shipping_method_form" model="ir.ui.view">
+        <field name="name">procurement.shipping.method.form</field>
+        <field name="model">procurement.shipping.method</field>
+        <field name="arch" type="xml">
+            <form string="Shipping Method">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" 
+                                class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" 
+                                   options='{"terminology": "archive"}'/>
+                        </button>
+                        <button class="oe_stat_button" icon="fa-truck">
+                            <field name="sample_count" widget="statinfo" string="Samples"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Shipping Method"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Air Freight, Sea Freight, Express Courier"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="e.g. AIR, SEA"/>
+                            <field name="shipping_type"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="estimated_days"/>
+                            <field name="is_express"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" 
+                               placeholder="Additional details about this shipping method..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Shipping Method Search View -->
+    <record id="view_procurement_shipping_method_search" model="ir.ui.view">
+        <field name="name">procurement.shipping.method.search</field>
+        <field name="model">procurement.shipping.method</field>
+        <field name="arch" type="xml">
+            <search string="Search Shipping Methods">
+                <field name="name"/>
+                <field name="code"/>
+                <separator/>
+                <filter string="Express" name="express" 
+                        domain="[('is_express', '=', True)]"/>
+                <filter string="Air" name="air" 
+                        domain="[('shipping_type', '=', 'air')]"/>
+                <filter string="Sea" name="sea" 
+                        domain="[('shipping_type', '=', 'sea')]"/>
+                <filter string="Active" name="active" 
+                        domain="[('active', '=', True)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Type" name="group_type" 
+                            context="{'group_by': 'shipping_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Shipping Method Action -->
+    <record id="action_procurement_shipping_method" model="ir.actions.act_window">
+        <field name="name">Shipping Methods</field>
+        <field name="res_model">procurement.shipping.method</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_procurement_shipping_method_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create shipping methods
+            </p>
+            <p>
+                Define the different shipping methods available for
+                sending samples (air, sea, courier, etc.).
+            </p>
+        </field>
+    </record>
+    
+</odoo>

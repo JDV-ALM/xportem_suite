@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Sample Status Initial Data -->
+        <record id="sample_status_requested" model="procurement.sample.status">
+            <field name="name">Requested</field>
+            <field name="code">REQ</field>
+            <field name="sequence">10</field>
+            <field name="is_initial">True</field>
+            <field name="is_final">False</field>
+            <field name="description">Sample has been requested from supplier</field>
+            <field name="color">1</field>
+        </record>
+        
+        <record id="sample_status_preparing" model="procurement.sample.status">
+            <field name="name">Preparing by Supplier</field>
+            <field name="code">PREP</field>
+            <field name="sequence">20</field>
+            <field name="is_initial">False</field>
+            <field name="is_final">False</field>
+            <field name="description">Supplier is preparing the sample</field>
+            <field name="color">2</field>
+        </record>
+        
+        <record id="sample_status_sent" model="procurement.sample.status">
+            <field name="name">Sent by Supplier</field>
+            <field name="code">SENT</field>
+            <field name="sequence">30</field>
+            <field name="is_initial">False</field>
+            <field name="is_final">False</field>
+            <field name="requires_shipping_method">True</field>
+            <field name="description">Sample has been sent by supplier</field>
+            <field name="color">3</field>
+        </record>
+        
+        <record id="sample_status_broker" model="procurement.sample.status">
+            <field name="name">Received by Broker</field>
+            <field name="code">BROKER</field>
+            <field name="sequence">40</field>
+            <field name="is_initial">False</field>
+            <field name="is_final">False</field>
+            <field name="requires_location">True</field>
+            <field name="description">Sample received by broker/agent</field>
+            <field name="color">4</field>
+        </record>
+        
+        <record id="sample_status_transit" model="procurement.sample.status">
+            <field name="name">In Transit to Destination</field>
+            <field name="code">TRANSIT</field>
+            <field name="sequence">50</field>
+            <field name="is_initial">False</field>
+            <field name="is_final">False</field>
+            <field name="requires_shipping_method">True</field>
+            <field name="description">Sample in transit to final destination</field>
+            <field name="color">5</field>
+        </record>
+        
+        <record id="sample_status_customs" model="procurement.sample.status">
+            <field name="name">In Customs</field>
+            <field name="code">CUSTOMS</field>
+            <field name="sequence">60</field>
+            <field name="is_initial">False</field>
+            <field name="is_final">False</field>
+            <field name="requires_location">True</field>
+            <field name="description">Sample in customs clearance</field>
+            <field name="color">6</field>
+        </record>
+        
+        <record id="sample_status_received" model="procurement.sample.status">
+            <field name="name">Received at Destination</field>
+            <field name="code">RECEIVED</field>
+            <field name="sequence">70</field>
+            <field name="is_initial">False</field>
+            <field name="is_final">True</field>
+            <field name="requires_location">True</field>
+            <field name="description">Sample received at final destination</field>
+            <field name="color">10</field>
+        </record>
+        
+        <record id="sample_status_cancelled" model="procurement.sample.status">
+            <field name="name">Cancelled</field>
+            <field name="code">CANCEL</field>
+            <field name="sequence">99</field>
+            <field name="is_initial">False</field>
+            <field name="is_final">True</field>
+            <field name="description">Sample request cancelled</field>
+            <field name="color">9</field>
+        </record>
+        
+        <!-- Shipping Methods Initial Data -->
+        <record id="shipping_method_air" model="procurement.shipping.method">
+            <field name="name">Air Freight</field>
+            <field name="code">AIR</field>
+            <field name="sequence">10</field>
+            <field name="shipping_type">air</field>
+            <field name="estimated_days">7</field>
+            <field name="is_express">True</field>
+            <field name="description">Fast air shipping for urgent samples</field>
+        </record>
+        
+        <record id="shipping_method_sea" model="procurement.shipping.method">
+            <field name="name">Sea Freight</field>
+            <field name="code">SEA</field>
+            <field name="sequence">20</field>
+            <field name="shipping_type">sea</field>
+            <field name="estimated_days">45</field>
+            <field name="is_express">False</field>
+            <field name="description">Economic sea shipping for non-urgent samples</field>
+        </record>
+        
+        <record id="shipping_method_courier" model="procurement.shipping.method">
+            <field name="name">Express Courier</field>
+            <field name="code">EXPRESS</field>
+            <field name="sequence">5</field>
+            <field name="shipping_type">courier</field>
+            <field name="estimated_days">3</field>
+            <field name="is_express">True</field>
+            <field name="description">DHL, FedEx, UPS for very urgent samples</field>
+        </record>
+        
+        <!-- Sample Locations Initial Data -->
+        <record id="location_china_supplier" model="procurement.sample.location">
+            <field name="name">China Supplier</field>
+            <field name="code">CN-SUPP</field>
+            <field name="sequence">10</field>
+            <field name="location_type">origin</field>
+            <field name="country_id" ref="base.cn"/>
+            <field name="description">Original supplier location in China</field>
+        </record>
+        
+        <record id="location_china_broker" model="procurement.sample.location">
+            <field name="name">China Broker Office</field>
+            <field name="code">CN-BROKER</field>
+            <field name="sequence">20</field>
+            <field name="location_type">broker</field>
+            <field name="country_id" ref="base.cn"/>
+            <field name="description">Broker consolidation point in China</field>
+        </record>
+        
+        <record id="location_venezuela_customs" model="procurement.sample.location">
+            <field name="name">Venezuela Customs</field>
+            <field name="code">VE-CUSTOMS</field>
+            <field name="sequence">30</field>
+            <field name="location_type">customs</field>
+            <field name="country_id" ref="base.ve"/>
+            <field name="city">Caracas</field>
+            <field name="description">Customs clearance in Venezuela</field>
+        </record>
+        
+        <record id="location_venezuela_destination" model="procurement.sample.location">
+            <field name="name">Venezuela Office</field>
+            <field name="code">VE-OFFICE</field>
+            <field name="sequence">40</field>
+            <field name="location_type">destination</field>
+            <field name="country_id" ref="base.ve"/>
+            <field name="city">Caracas</field>
+            <field name="is_final_destination">True</field>
+            <field name="description">Final destination office in Venezuela</field>
+        </record>
+        
+    </data>
+</odoo>

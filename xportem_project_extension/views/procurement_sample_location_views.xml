@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Sample Location List View -->
+    <record id="view_procurement_sample_location_list" model="ir.ui.view">
+        <field name="name">procurement.sample.location.list</field>
+        <field name="model">procurement.sample.location</field>
+        <field name="arch" type="xml">
+            <list string="Sample Locations" default_order="sequence">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="location_type"/>
+                <field name="country_id"/>
+                <field name="city"/>
+                <field name="partner_id" optional="show"/>
+                <field name="is_final_destination" string="Final Dest."/>
+                <field name="active" invisible="1"/>
+                <field name="sample_count" string="Samples"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Sample Location Form View -->
+    <record id="view_procurement_sample_location_form" model="ir.ui.view">
+        <field name="name">procurement.sample.location.form</field>
+        <field name="model">procurement.sample.location</field>
+        <field name="arch" type="xml">
+            <form string="Sample Location">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" 
+                                class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" 
+                                   options='{"terminology": "archive"}'/>
+                        </button>
+                        <button class="oe_stat_button" icon="fa-map-marker">
+                            <field name="sample_count" widget="statinfo" string="Samples"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Location Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. China Broker Office, Venezuela Customs"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="e.g. CN-BROKER"/>
+                            <field name="location_type"/>
+                            <field name="sequence"/>
+                            <field name="is_final_destination"/>
+                        </group>
+                        <group>
+                            <field name="country_id" options="{'no_create': True}"/>
+                            <field name="city"/>
+                            <field name="partner_id" 
+                                   context="{'default_is_company': True}"
+                                   help="Company or partner managing this location"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" 
+                               placeholder="Additional details about this location..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Sample Location Search View -->
+    <record id="view_procurement_sample_location_search" model="ir.ui.view">
+        <field name="name">procurement.sample.location.search</field>
+        <field name="model">procurement.sample.location</field>
+        <field name="arch" type="xml">
+            <search string="Search Sample Locations">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="country_id"/>
+                <field name="city"/>
+                <separator/>
+                <filter string="Final Destinations" name="final" 
+                        domain="[('is_final_destination', '=', True)]"/>
+                <filter string="Brokers" name="broker" 
+                        domain="[('location_type', '=', 'broker')]"/>
+                <filter string="Customs" name="customs" 
+                        domain="[('location_type', '=', 'customs')]"/>
+                <filter string="Active" name="active" 
+                        domain="[('active', '=', True)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Type" name="group_type" 
+                            context="{'group_by': 'location_type'}"/>
+                    <filter string="Country" name="group_country" 
+                            context="{'group_by': 'country_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Sample Location Action -->
+    <record id="action_procurement_sample_location" model="ir.actions.act_window">
+        <field name="name">Sample Locations</field>
+        <field name="res_model">procurement.sample.location</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_procurement_sample_location_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create sample locations
+            </p>
+            <p>
+                Define the different locations where samples can be
+                during their journey (broker offices, customs, warehouses, etc.).
+            </p>
+        </field>
+    </record>
+    
+</odoo>

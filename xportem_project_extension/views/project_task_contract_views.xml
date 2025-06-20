@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Contract Form View -->
+    <record id="view_project_task_contract_form" model="ir.ui.view">
+        <field name="name">project.task.contract.form</field>
+        <field name="model">project.task.contract</field>
+        <field name="arch" type="xml">
+            <form string="Contract &amp; Invoice">
+                <header>
+                    <button name="action_sign_contract" string="Mark as Signed" 
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_complete" string="Mark as Completed" 
+                            type="object" class="oe_highlight"
+                            invisible="state != 'invoiced'"/>
+                    <button name="action_cancel" string="Cancel" 
+                            type="object"
+                            invisible="state in ['completed', 'cancelled']"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="draft,signed,invoiced,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="contract_reference" string="Contract Reference"/>
+                        <h1>
+                            <field name="contract_reference" 
+                                   placeholder="e.g. PO-2024-001"
+                                   readonly="state != 'draft'"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="General Information">
+                            <field name="task_id" readonly="state != 'draft'"/>
+                            <field name="product_display_name"/>
+                            <field name="supplier_id" 
+                                   readonly="state != 'draft'"
+                                   required="1"
+                                   context="{'default_x_is_china_supplier': True}"/>
+                            <field name="selected_supplier_id" invisible="1"/>
+                        </group>
+                        <group string="Contract Details">
+                            <field name="contract_date" readonly="state != 'draft'"/>
+                            <field name="contract_amount" 
+                                   readonly="state != 'draft'"
+                                   widget="monetary"/>
+                            <field name="currency_id" 
+                                   readonly="state != 'draft'"
+                                   groups="base.group_multi_currency"/>
+                            <field name="purchase_order_id" 
+                                   readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Contract Document">
+                            <field name="contract_filename" invisible="1"/>
+                            <field name="contract_file" 
+                                   filename="contract_filename"
+                                   readonly="state not in ['draft', 'signed']"/>
+                        </group>
+                        <group string="Delivery Information">
+                            <field name="delivery_terms" 
+                                   readonly="state != 'draft'"
+                                   placeholder="e.g. FOB Shanghai"/>
+                            <field name="expected_delivery_date" 
+                                   readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Payment Terms">
+                        <field name="payment_terms" nolabel="1" 
+                               readonly="state != 'draft'"
+                               placeholder="Payment conditions as per contract..."/>
+                    </group>
+                    
+                    <separator string="Invoice Information"/>
+                    
+                    <group>
+                        <group>
+                            <field name="has_invoice" 
+                                   readonly="state not in ['signed', 'invoiced']"/>
+                            <field name="invoice_number" 
+                                   invisible="not has_invoice"
+                                   readonly="state not in ['signed', 'invoiced']"/>
+                            <field name="invoice_date" 
+                                   invisible="not has_invoice"
+                                   readonly="state not in ['signed', 'invoiced']"/>
+                            <field name="invoice_amount" 
+                                   invisible="not has_invoice"
+                                   readonly="state not in ['signed', 'invoiced']"
+                                   widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="invoice_filename" invisible="1"/>
+                            <field name="invoice_file" 
+                                   filename="invoice_filename"
+                                   invisible="not has_invoice"
+                                   readonly="state not in ['signed', 'invoiced']"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Additional Documents" name="documents">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" nolabel="1" 
+                                   placeholder="Additional notes about this contract..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Contract List View -->
+    <record id="view_project_task_contract_list" model="ir.ui.view">
+        <field name="name">project.task.contract.list</field>
+        <field name="model">project.task.contract</field>
+        <field name="arch" type="xml">
+            <list string="Contracts &amp; Invoices" default_order="create_date desc">
+                <field name="contract_reference"/>
+                <field name="task_id"/>
+                <field name="supplier_id"/>
+                <field name="contract_date"/>
+                <field name="contract_amount" widget="monetary" sum="Total"/>
+                <field name="currency_id" groups="base.group_multi_currency"/>
+                <field name="has_invoice" string="Invoice"/>
+                <field name="expected_delivery_date" optional="show"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state=='completed'"
+                       decoration-info="state=='invoiced'"
+                       decoration-warning="state=='signed'"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Contract Search View -->
+    <record id="view_project_task_contract_search" model="ir.ui.view">
+        <field name="name">project.task.contract.search</field>
+        <field name="model">project.task.contract</field>
+        <field name="arch" type="xml">
+            <search string="Search Contracts">
+                <field name="contract_reference"/>
+                <field name="task_id"/>
+                <field name="supplier_id"/>
+                <field name="invoice_number"/>
+                <separator/>
+                <filter string="Signed" name="signed"
+                        domain="[('state', 'in', ['signed', 'invoiced', 'completed'])]"/>
+                <filter string="Has Invoice" name="has_invoice"
+                        domain="[('has_invoice', '=', True)]"/>
+                <filter string="No Invoice" name="no_invoice"
+                        domain="[('has_invoice', '=', False), ('state', '!=', 'draft')]"/>
+                <separator/>
+                <filter string="This Month" name="this_month"
+                        domain="[('contract_date','&gt;=',(datetime.date.today()-datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Task" name="group_task"
+                            context="{'group_by': 'task_id'}"/>
+                    <filter string="Supplier" name="group_supplier"
+                            context="{'group_by': 'supplier_id'}"/>
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Contract Date" name="group_date"
+                            context="{'group_by': 'contract_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Contract Action -->
+    <record id="action_project_task_contract" model="ir.actions.act_window">
+        <field name="name">Contracts &amp; Invoices</field>
+        <field name="res_model">project.task.contract</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_project_task_contract_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a contract record
+            </p>
+            <p>
+                Manage purchase contracts and invoices for your procurement tasks,
+                including document storage and tracking.
+            </p>
+        </field>
+    </record>
+    
+</odoo>

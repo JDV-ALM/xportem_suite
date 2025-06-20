@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Extend Project Task Form View -->
+    <record id="view_project_task_form_extension" model="ir.ui.view">
+        <field name="name">project.task.form.extension</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="xportem_project.view_project_task_form_xportem"/>
+        <field name="arch" type="xml">
+            
+            <!-- Add invisible fields -->
+            <xpath expr="//sheet//group[@invisible='1']" position="inside">
+                <field name="sample_count"/>
+                <field name="active_sample_count"/>
+                <field name="contract_count"/>
+                <field name="has_signed_contract"/>
+                <field name="has_invoice"/>
+                <field name="total_sample_cost"/>
+                <field name="pending_sample_payments"/>
+            </xpath>
+            
+            <!-- Add stat buttons after existing ones -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <!-- Samples button -->
+                <button name="action_view_samples" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-flask"
+                        invisible="not x_is_request">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="sample_count"/>
+                        </span>
+                        <span class="o_stat_text">Samples</span>
+                        <span class="o_stat_text text-warning" invisible="active_sample_count == 0">
+                            (<field name="active_sample_count"/> active)
+                        </span>
+                    </div>
+                </button>
+                
+                <!-- Contracts button -->
+                <button name="action_view_contracts" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-file-text-o"
+                        invisible="not x_is_evaluation">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="contract_count"/>
+                        </span>
+                        <span class="o_stat_text">Contracts</span>
+                        <span class="o_stat_text text-success" invisible="not has_invoice">
+                            <i class="fa fa-check"/> Invoice
+                        </span>
+                    </div>
+                </button>
+                
+                <!-- Sample payments button -->
+                <button name="action_view_samples" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-money"
+                        invisible="pending_sample_payments == 0">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value text-warning">
+                            <field name="pending_sample_payments"/>
+                        </span>
+                        <span class="o_stat_text">Pending</span>
+                        <span class="o_stat_text">Payments</span>
+                    </div>
+                </button>
+            </xpath>
+            
+            <!-- Add new tabs to notebook -->
+            <xpath expr="//notebook" position="inside">
+                
+                <!-- Samples Tab -->
+                <page string="Solicitud de Muestras" 
+                      invisible="not x_is_request" 
+                      name="samples_management">
+                    <div class="mb-3">
+                        <button name="action_create_sample" 
+                                type="object" 
+                                string="Nueva Muestra" 
+                                class="btn-primary"/>
+                    </div>
+                    
+                    <field name="sample_ids" mode="kanban"
+                           context="{'default_task_id': id}">
+                        <kanban>
+                            <field name="reference"/>
+                            <field name="supplier_id"/>
+                            <field name="state"/>
+                            <field name="current_location_id"/>
+                            <field name="payment_state"/>
+                            <field name="has_cost"/>
+                            <field name="total_cost"/>
+                            <field name="currency_id"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_global_click o_kanban_record_has_image_fill oe_kanban_card">
+                                        <div class="oe_kanban_details">
+                                            <div class="o_kanban_record_top">
+                                                <div class="o_kanban_record_headings">
+                                                    <strong class="o_kanban_record_title">
+                                                        <field name="reference"/>
+                                                    </strong>
+                                                    <span class="o_kanban_record_subtitle">
+                                                        <field name="supplier_id"/>
+                                                    </span>
+                                                </div>
+                                                <field name="state" widget="label_selection" 
+                                                       options="{'classes': {'draft': 'secondary', 
+                                                                           'requested': 'warning', 
+                                                                           'in_transit': 'info',
+                                                                           'received': 'success',
+                                                                           'cancelled': 'danger'}}"/>
+                                            </div>
+                                            <div class="o_kanban_record_body mt-2">
+                                                <div t-if="record.current_location_id.raw_value">
+                                                    <i class="fa fa-map-marker text-muted"/> 
+                                                    <span class="text-muted"><field name="current_location_id"/></span>
+                                                </div>
+                                                <div t-if="record.has_cost.raw_value" class="mt-1">
+                                                    <strong>Cost: </strong>
+                                                    <field name="total_cost" widget="monetary"/>
+                                                    <span t-if="record.payment_state.raw_value == 'pending'" 
+                                                          class="badge badge-warning ms-2">
+                                                        <i class="fa fa-clock-o"/> Pending Payment
+                                                    </span>
+                                                    <span t-if="record.payment_state.raw_value == 'paid'" 
+                                                          class="badge badge-success ms-2">
+                                                        <i class="fa fa-check"/> Paid
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                    
+                    <group string="Resumen de Muestras" invisible="sample_count == 0">
+                        <group>
+                            <field name="sample_count" string="Total de Muestras"/>
+                            <field name="active_sample_count" string="Muestras Activas"/>
+                        </group>
+                        <group>
+                            <field name="total_sample_cost" widget="monetary" string="Costo Total de Muestras"/>
+                            <field name="pending_sample_payments" string="Pagos Pendientes"/>
+                        </group>
+                    </group>
+                </page>
+                
+                <!-- Contracts Tab -->
+                <page string="Contratos y Facturas" 
+                      invisible="not x_is_evaluation" 
+                      name="contracts_management">
+                    <div class="mb-3">
+                        <button name="action_create_contract" 
+                                type="object" 
+                                string="Nuevo Contrato" 
+                                class="btn-primary"/>
+                    </div>
+                    
+                    <field name="contract_ids" 
+                           context="{'default_task_id': id}">
+                        <list string="Contratos" editable="bottom">
+                            <field name="contract_reference"/>
+                            <field name="supplier_id"/>
+                            <field name="contract_date"/>
+                            <field name="contract_amount" widget="monetary" sum="Total"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="has_invoice" string="Factura"/>
+                            <field name="invoice_number" optional="show"/>
+                            <field name="state" widget="badge"/>
+                        </list>
+                    </field>
+                    
+                    <group string="Resumen de Contratos" invisible="contract_count == 0">
+                        <group>
+                            <field name="contract_count" string="Total de Contratos"/>
+                            <field name="has_signed_contract" string="Tiene Contrato Firmado"/>
+                        </group>
+                        <group>
+                            <field name="has_invoice" string="Tiene Factura"/>
+                        </group>
+                    </group>
+                </page>
+                
+            </xpath>
+            
+        </field>
+    </record>
+    
+</odoo>

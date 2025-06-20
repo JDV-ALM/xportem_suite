@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Sample Status List View -->
+    <record id="view_procurement_sample_status_list" model="ir.ui.view">
+        <field name="name">procurement.sample.status.list</field>
+        <field name="model">procurement.sample.status</field>
+        <field name="arch" type="xml">
+            <list string="Sample Statuses" default_order="sequence">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="is_initial" string="Initial"/>
+                <field name="is_final" string="Final"/>
+                <field name="requires_location" string="Req. Location"/>
+                <field name="requires_shipping_method" string="Req. Shipping"/>
+                <field name="active" invisible="1"/>
+                <field name="sample_count" string="Samples"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Sample Status Form View -->
+    <record id="view_procurement_sample_status_form" model="ir.ui.view">
+        <field name="name">procurement.sample.status.form</field>
+        <field name="model">procurement.sample.status</field>
+        <field name="arch" type="xml">
+            <form string="Sample Status">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" 
+                                class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" 
+                                   options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Status Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Requested, In Transit, Received"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="e.g. REQ, TRANSIT"/>
+                            <field name="sequence"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                        <group>
+                            <field name="is_initial"/>
+                            <field name="is_final"/>
+                            <field name="requires_location"/>
+                            <field name="requires_shipping_method"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" 
+                               placeholder="Describe what this status means..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Sample Status Search View -->
+    <record id="view_procurement_sample_status_search" model="ir.ui.view">
+        <field name="name">procurement.sample.status.search</field>
+        <field name="model">procurement.sample.status</field>
+        <field name="arch" type="xml">
+            <search string="Search Sample Status">
+                <field name="name"/>
+                <field name="code"/>
+                <separator/>
+                <filter string="Initial" name="initial" 
+                        domain="[('is_initial', '=', True)]"/>
+                <filter string="Final" name="final" 
+                        domain="[('is_final', '=', True)]"/>
+                <filter string="Active" name="active" 
+                        domain="[('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" 
+                        domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Sample Status Action -->
+    <record id="action_procurement_sample_status" model="ir.actions.act_window">
+        <field name="name">Sample Statuses</field>
+        <field name="res_model">procurement.sample.status</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_procurement_sample_status_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create sample statuses
+            </p>
+            <p>
+                Define the different statuses that samples can have
+                throughout their journey from request to delivery.
+            </p>
+        </field>
+    </record>
+    
+</odoo>

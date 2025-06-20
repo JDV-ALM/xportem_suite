@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_procurement_sample_status_user,procurement.sample.status.user,model_procurement_sample_status,base.group_user,1,1,1,1
+access_procurement_sample_status_portal,procurement.sample.status.portal,model_procurement_sample_status,base.group_portal,1,0,0,0
+access_procurement_shipping_method_user,procurement.shipping.method.user,model_procurement_shipping_method,base.group_user,1,1,1,1
+access_procurement_shipping_method_portal,procurement.shipping.method.portal,model_procurement_shipping_method,base.group_portal,1,0,0,0
+access_procurement_sample_location_user,procurement.sample.location.user,model_procurement_sample_location,base.group_user,1,1,1,1
+access_procurement_sample_location_portal,procurement.sample.location.portal,model_procurement_sample_location,base.group_portal,1,0,0,0
+access_project_task_sample_user,project.task.sample.user,model_project_task_sample,base.group_user,1,1,1,1
+access_project_task_sample_portal,project.task.sample.portal,model_project_task_sample,base.group_portal,1,0,0,0
+access_project_task_sample_tracking_user,project.task.sample.tracking.user,model_project_task_sample_tracking,base.group_user,1,1,1,1
+access_project_task_sample_tracking_portal,project.task.sample.tracking.portal,model_project_task_sample_tracking,base.group_portal,1,0,0,0
+access_project_task_contract_user,project.task.contract.user,model_project_task_contract,base.group_user,1,1,1,1
+access_project_task_contract_portal,project.task.contract.portal,model_project_task_contract,base.group_portal,1,0,0,0
