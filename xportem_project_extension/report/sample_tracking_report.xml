@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Sample Tracking Report -->
+    <report id="report_sample_tracking"
+            model="project.task.sample"
+            string="Sample Tracking Report"
+            report_type="qweb-pdf"
+            name="xportem_project_extension.report_sample_tracking_document"
+            file="xportem_project_extension.report_sample_tracking_document"
+            print_report_name="'Sample Tracking - %s' % (object.reference)"
+    />
+    
+    <!-- Report Template -->
+    <template id="report_sample_tracking_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Header -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h2>Sample Tracking Report</h2>
+                                <h3><t t-esc="doc.reference"/></h3>
+                            </div>
+                        </div>
+                        
+                        <!-- Basic Information -->
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <strong>Task:</strong> <span t-field="doc.task_id.name"/><br/>
+                                <strong>Product:</strong> <span t-field="doc.product_display_name"/><br/>
+                                <strong>Supplier:</strong> <span t-field="doc.supplier_id.name"/><br/>
+                                <strong>Quantity:</strong> <span t-field="doc.quantity"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Request Date:</strong> <span t-field="doc.request_date"/><br/>
+                                <strong>Expected Date:</strong> <span t-field="doc.expected_date"/><br/>
+                                <strong>Current Status:</strong> 
+                                <span t-field="doc.state" 
+                                      t-options='{"widget": "badge"}'
+                                      class="badge badge-info"/><br/>
+                                <strong>Current Location:</strong> <span t-field="doc.current_location_id.name"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="row mt-4" t-if="doc.sample_description">
+                            <div class="col-12">
+                                <h4>Sample Description</h4>
+                                <p t-field="doc.sample_description"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Cost Information -->
+                        <div class="row mt-4" t-if="doc.has_cost">
+                            <div class="col-12">
+                                <h4>Cost Information</h4>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td>Sample Cost:</td>
+                                        <td class="text-right">
+                                            <span t-field="doc.sample_cost" 
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Shipping Cost:</td>
+                                        <td class="text-right">
+                                            <span t-field="doc.shipping_cost" 
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr class="font-weight-bold">
+                                        <td>Total Cost:</td>
+                                        <td class="text-right">
+                                            <span t-field="doc.total_cost" 
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Payment Status:</td>
+                                        <td class="text-right">
+                                            <span t-field="doc.payment_state"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Tracking History -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4>Tracking History</h4>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Date &amp; Time</th>
+                                            <th>Status</th>
+                                            <th>Location</th>
+                                            <th>Shipping Method</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="doc.tracking_line_ids" t-as="line">
+                                            <tr>
+                                                <td><span t-field="line.date" t-options='{"widget": "datetime"}'/></td>
+                                                <td><span t-field="line.status_id.name"/></td>
+                                                <td><span t-field="line.location_id.name"/></td>
+                                                <td><span t-field="line.shipping_method_id.name"/></td>
+                                                <td><span t-field="line.notes"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Shipping Information -->
+                        <div class="row mt-4" t-if="doc.tracking_number or doc.shipping_method_id">
+                            <div class="col-12">
+                                <h4>Shipping Information</h4>
+                                <strong>Method:</strong> <span t-field="doc.shipping_method_id.name"/><br/>
+                                <strong>Tracking Number:</strong> <span t-field="doc.tracking_number"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Notes -->
+                        <div class="row mt-4" t-if="doc.notes">
+                            <div class="col-12">
+                                <h4>Additional Notes</h4>
+                                <p t-field="doc.notes"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="row mt-5">
+                            <div class="col-12 text-center text-muted">
+                                <small>
+                                    Report generated on <span t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    
+</odoo>
