@@ -1,74 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        
-        <!-- Module Category -->
-        <record id="module_category_xportem_procurement" model="ir.module.category">
-            <field name="name">Xportem Procurement</field>
-            <field name="description">Xportem Procurement Suite Access Rights</field>
-            <field name="sequence">20</field>
-        </record>
-        
-        <!-- Groups -->
-        <record id="group_procurement_user" model="res.groups">
-            <field name="name">Procurement User</field>
-            <field name="category_id" ref="module_category_xportem_procurement"/>
-            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-        </record>
-        
-        <record id="group_procurement_manager" model="res.groups">
-            <field name="name">Procurement Manager</field>
-            <field name="category_id" ref="module_category_xportem_procurement"/>
-            <field name="implied_ids" eval="[(4, ref('group_procurement_user'))]"/>
-            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
-        </record>
-        
-        <record id="group_sample_manager" model="res.groups">
-            <field name="name">Sample Manager</field>
-            <field name="category_id" ref="module_category_xportem_procurement"/>
-            <field name="implied_ids" eval="[(4, ref('group_procurement_user'))]"/>
-        </record>
-        
-        <!-- Record Rules -->
-        
-        <!-- Samples: Users can see all samples but edit only their own -->
-        <record id="sample_user_rule" model="ir.rule">
-            <field name="name">Sample: User can edit own</field>
-            <field name="model_id" ref="model_project_task_sample"/>
-            <field name="domain_force">[('create_uid', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_procurement_user'))]"/>
-            <field name="perm_read" eval="False"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="True"/>
-        </record>
-        
-        <!-- Samples: Managers can edit all -->
-        <record id="sample_manager_rule" model="ir.rule">
-            <field name="name">Sample: Manager all</field>
-            <field name="model_id" ref="model_project_task_sample"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('group_procurement_manager')), (4, ref('group_sample_manager'))]"/>
-        </record>
-        
-        <!-- Contracts: Similar rules -->
-        <record id="contract_user_rule" model="ir.rule">
-            <field name="name">Contract: User can edit own</field>
-            <field name="model_id" ref="model_project_task_contract"/>
-            <field name="domain_force">[('create_uid', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_procurement_user'))]"/>
-            <field name="perm_read" eval="False"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="True"/>
-        </record>
-        
-        <record id="contract_manager_rule" model="ir.rule">
-            <field name="name">Contract: Manager all</field>
-            <field name="model_id" ref="model_project_task_contract"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('group_procurement_manager'))]"/>
-        </record>
-        
-    </data>
+    <!-- Module Category -->
+    <record id="module_category_xportem_procurement" model="ir.module.category">
+        <field name="name">Xportem Procurement</field>
+        <field name="description">Xportem Procurement Suite Access Rights</field>
+        <field name="sequence">20</field>
+    </record>
+    
+    <!-- Groups -->
+    <record id="group_procurement_user" model="res.groups">
+        <field name="name">Procurement User</field>
+        <field name="category_id" ref="module_category_xportem_procurement"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    
+    <record id="group_procurement_manager" model="res.groups">
+        <field name="name">Procurement Manager</field>
+        <field name="category_id" ref="module_category_xportem_procurement"/>
+        <field name="implied_ids" eval="[(4, ref('group_procurement_user'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+    
+    <record id="group_sample_manager" model="res.groups">
+        <field name="name">Sample Manager</field>
+        <field name="category_id" ref="module_category_xportem_procurement"/>
+        <field name="implied_ids" eval="[(4, ref('group_procurement_user'))]"/>
+    </record>
+    
+    <!-- Record Rules -->
+    
+    <!-- Samples: Users can see all samples but edit only their own -->
+    <record id="sample_user_rule" model="ir.rule">
+        <field name="name">Sample: User can edit own</field>
+        <field name="model_id" ref="model_project_task_sample"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_procurement_user'))]"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+    
+    <!-- Samples: Managers can edit all -->
+    <record id="sample_manager_rule" model="ir.rule">
+        <field name="name">Sample: Manager all</field>
+        <field name="model_id" ref="model_project_task_sample"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_procurement_manager')), (4, ref('group_sample_manager'))]"/>
+    </record>
+    
+    <!-- Contracts: Similar rules -->
+    <record id="contract_user_rule" model="ir.rule">
+        <field name="name">Contract: User can edit own</field>
+        <field name="model_id" ref="model_project_task_contract"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_procurement_user'))]"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+    
+    <record id="contract_manager_rule" model="ir.rule">
+        <field name="name">Contract: Manager all</field>
+        <field name="model_id" ref="model_project_task_contract"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_procurement_manager'))]"/>
+    </record>
 </odoo>
