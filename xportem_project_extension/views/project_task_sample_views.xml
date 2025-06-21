@@ -80,12 +80,12 @@
                     
                     <group>
                         <group string="Costs">
-                            <field name="has_cost" readonly="state not in ['draft']"/>
+                            <field name="has_cost" readonly="state not in ['draft', 'requested']"/>
                             <field name="sample_cost" 
-                                   readonly="state not in ['draft'] or not has_cost"
+                                   readonly="state not in ['draft', 'requested'] or not has_cost"
                                    invisible="not has_cost"/>
                             <field name="shipping_cost" 
-                                   readonly="state not in ['draft'] or not has_cost"
+                                   readonly="state not in ['draft', 'requested'] or not has_cost"
                                    invisible="not has_cost"/>
                             <field name="currency_id" invisible="not has_cost" 
                                    groups="base.group_multi_currency"/>
@@ -97,9 +97,12 @@
                         </group>
                         <group string="Tracking">
                             <field name="shipping_method_id" 
+                                   readonly="state not in ['draft', 'requested']"
                                    options="{'no_create': True}"/>
-                            <field name="tracking_number"/>
+                            <field name="tracking_number" 
+                                   readonly="state not in ['draft', 'requested']"/>
                             <field name="current_location_id" 
+                                   readonly="state not in ['draft', 'requested']"
                                    options="{'no_create': True}"/>
                             <field name="last_status_update" widget="datetime"/>
                         </group>
