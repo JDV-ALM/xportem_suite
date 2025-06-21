@@ -7,11 +7,11 @@ from odoo.exceptions import ValidationError
 class ProjectTask(models.Model):
     _inherit = 'project.task'
     
-    # Sample Management Fields
+    # Sample/Shipment Management Fields
     sample_ids = fields.One2many(
         'project.task.sample',
         'task_id',
-        string='Product Samples'
+        string='Samples & Shipments'
     )
     
     sample_count = fields.Integer(
@@ -22,6 +22,12 @@ class ProjectTask(models.Model):
     
     active_sample_count = fields.Integer(
         string='Active Samples',
+        compute='_compute_sample_count',
+        store=False
+    )
+    
+    shipment_count = fields.Integer(
+        string='Shipment Count',
         compute='_compute_sample_count',
         store=False
     )
@@ -65,11 +71,15 @@ class ProjectTask(models.Model):
         store=False
     )
     
-    @api.depends('sample_ids', 'sample_ids.state')
+    @api.depends('sample_ids', 'sample_ids.state', 'sample_ids.tracking_type')
     def _compute_sample_count(self):
-        """Compute sample counts"""
+        """Compute sample and shipment counts"""
         for task in self:
-            task.sample_count = len(task.sample_ids)
+            samples = task.sample_ids.filtered(lambda s: s.tracking_type == 'sample')
+            shipments = task.sample_ids.filtered(lambda s: s.tracking_type == 'shipment')
+            
+            task.sample_count = len(samples)
+            task.shipment_count = len(shipments)
             task.active_sample_count = len(task.sample_ids.filtered(
                 lambda s: s.state not in ['received', 'cancelled']
             ))
@@ -101,11 +111,11 @@ class ProjectTask(models.Model):
     
     # Action Methods
     def action_view_samples(self):
-        """View all samples for this task"""
+        """View all samples and shipments for this task"""
         self.ensure_one()
         
         return {
-            'name': _('Product Samples - %s') % self.name,
+            'name': _('Samples & Shipments - %s') % self.name,
             'type': 'ir.actions.act_window',
             'res_model': 'project.task.sample',
             'view_mode': 'list,form,kanban',
@@ -113,24 +123,27 @@ class ProjectTask(models.Model):
             'context': {
                 'default_task_id': self.id,
                 'default_supplier_id': self.x_selected_supplier_id.id if self.x_selected_supplier_id else False,
+                'search_default_group_type': 1,
             }
         }
     
     def action_create_sample(self):
-        """Create new sample request"""
+        """Create new sample or shipment request - Opens wizard"""
         self.ensure_one()
         
+        # Use the wizard for multiple suppliers
         return {
-            'name': _('New Sample Request'),
+            'name': _('Create Sample/Shipment Request'),
             'type': 'ir.actions.act_window',
-            'res_model': 'project.task.sample',
+            'res_model': 'project.task.sample.wizard',
             'view_mode': 'form',
+            'target': 'new',
             'context': {
+                'active_id': self.id,
                 'default_task_id': self.id,
-                'default_supplier_id': self.x_selected_supplier_id.id if self.x_selected_supplier_id else False,
                 'default_sample_description': self.x_product_display_name or '',
-            },
-            'target': 'current',
+                'default_supplier_ids': [(6, 0, self.x_potential_supplier_ids.ids)] if self.x_potential_supplier_ids else False,
+            }
         }
     
     def action_view_contracts(self):
@@ -153,10 +166,10 @@ class ProjectTask(models.Model):
         """Create new contract"""
         self.ensure_one()
         
-        if not self.x_selected_supplier_id:
-            raise ValidationError(
-                _('Please select a supplier before creating a contract.')
-            )
+        # Get default supplier - either selected or first potential
+        default_supplier = self.x_selected_supplier_id
+        if not default_supplier and self.x_potential_supplier_ids:
+            default_supplier = self.x_potential_supplier_ids[0]
         
         return {
             'name': _('New Contract'),
@@ -165,7 +178,7 @@ class ProjectTask(models.Model):
             'view_mode': 'form',
             'context': {
                 'default_task_id': self.id,
-                'default_supplier_id': self.x_selected_supplier_id.id,
+                'default_supplier_id': default_supplier.id if default_supplier else False,
                 'default_purchase_order_id': self.x_purchase_order_id.id if self.x_purchase_order_id else False,
             },
             'target': 'current',

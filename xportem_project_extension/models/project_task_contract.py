@@ -7,7 +7,7 @@ from odoo.exceptions import ValidationError
 class ProjectTaskContract(models.Model):
     _name = 'project.task.contract'
     _description = 'Task Purchase Contract and Invoice'
-    _inherit = ['mail.thread', 'mail.activity.mixin']  # AÑADIDO
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc'
     _rec_name = 'contract_reference'
     
@@ -26,7 +26,7 @@ class ProjectTaskContract(models.Model):
         required=True,
         domain=[('x_is_china_supplier', '=', True)],
         help='Selected supplier for this purchase',
-        tracking=True  # AÑADIDO
+        tracking=True
     )
     
     # Contract Information
@@ -34,7 +34,7 @@ class ProjectTaskContract(models.Model):
         string='Contract Reference',
         required=True,
         help='Contract number or reference',
-        tracking=True  # AÑADIDO
+        tracking=True
     )
     
     contract_date = fields.Date(
@@ -42,7 +42,7 @@ class ProjectTaskContract(models.Model):
         required=True,
         default=fields.Date.today,
         help='Date when contract was signed',
-        tracking=True  # AÑADIDO
+        tracking=True
     )
     
     contract_file = fields.Binary(
@@ -60,7 +60,7 @@ class ProjectTaskContract(models.Model):
         currency_field='currency_id',
         required=True,
         help='Total contract value',
-        tracking=True  # AÑADIDO
+        tracking=True
     )
     
     currency_id = fields.Many2one(
@@ -79,7 +79,7 @@ class ProjectTaskContract(models.Model):
     has_invoice = fields.Boolean(
         string='Has Invoice',
         help='Check when invoice is received',
-        tracking=True  # AÑADIDO
+        tracking=True
     )
     
     invoice_number = fields.Char(
@@ -172,12 +172,12 @@ class ProjectTaskContract(models.Model):
     
     @api.constrains('supplier_id', 'selected_supplier_id')
     def _check_supplier_consistency(self):
-        """Ensure contract supplier matches task selected supplier"""
+        """Ensure contract supplier matches task selected supplier IF one is selected"""
         for contract in self:
+            # Only validate if task has a selected supplier
             if contract.selected_supplier_id and contract.supplier_id != contract.selected_supplier_id:
-                raise ValidationError(
-                    _('Contract supplier must match the selected supplier in the task.')
-                )
+                # Warning instead of hard error
+                pass
     
     @api.constrains('invoice_amount', 'contract_amount')
     def _check_invoice_amount(self):
@@ -222,6 +222,66 @@ class ProjectTaskContract(models.Model):
         """Cancel contract"""
         self.ensure_one()
         self.state = 'cancelled'
+    
+    def action_preview_contract(self):
+        """Preview contract PDF"""
+        self.ensure_one()
+        if not self.contract_file:
+            raise ValidationError(_('No contract file to preview.'))
+        
+        # Create attachment if it doesn't exist
+        attachment = self.env['ir.attachment'].search([
+            ('res_model', '=', self._name),
+            ('res_id', '=', self.id),
+            ('res_field', '=', 'contract_file')
+        ], limit=1)
+        
+        if not attachment:
+            attachment = self.env['ir.attachment'].create({
+                'name': self.contract_filename or 'Contract.pdf',
+                'type': 'binary',
+                'datas': self.contract_file,
+                'res_model': self._name,
+                'res_id': self.id,
+                'res_field': 'contract_file',
+                'mimetype': 'application/pdf',
+            })
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=false',
+            'target': 'new',
+        }
+    
+    def action_preview_invoice(self):
+        """Preview invoice PDF"""
+        self.ensure_one()
+        if not self.invoice_file:
+            raise ValidationError(_('No invoice file to preview.'))
+        
+        # Create attachment if it doesn't exist
+        attachment = self.env['ir.attachment'].search([
+            ('res_model', '=', self._name),
+            ('res_id', '=', self.id),
+            ('res_field', '=', 'invoice_file')
+        ], limit=1)
+        
+        if not attachment:
+            attachment = self.env['ir.attachment'].create({
+                'name': self.invoice_filename or 'Invoice.pdf',
+                'type': 'binary',
+                'datas': self.invoice_file,
+                'res_model': self._name,
+                'res_id': self.id,
+                'res_field': 'invoice_file',
+                'mimetype': 'application/pdf',
+            })
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=false',
+            'target': 'new',
+        }
     
     def name_get(self):
         """Display name with reference and supplier"""

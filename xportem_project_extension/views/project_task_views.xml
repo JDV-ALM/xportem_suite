@@ -12,6 +12,7 @@
             <xpath expr="//sheet//group[@invisible='1']" position="inside">
                 <field name="currency_id" invisible="1"/>
                 <field name="sample_count"/>
+                <field name="shipment_count"/>
                 <field name="active_sample_count"/>
                 <field name="contract_count"/>
                 <field name="has_signed_contract"/>
@@ -22,38 +23,30 @@
             
             <!-- Add stat buttons after existing ones -->
             <xpath expr="//div[@name='button_box']" position="inside">
-                <!-- Samples button -->
+                <!-- Samples & Shipments button -->
                 <button name="action_view_samples" 
                         type="object" 
                         class="oe_stat_button" 
-                        icon="fa-flask"
+                        icon="fa-truck"
                         invisible="not x_is_request">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_value">
-                            <field name="sample_count"/>
+                            <field name="sample_count"/> / <field name="shipment_count"/>
                         </span>
-                        <span class="o_stat_text">Samples</span>
+                        <span class="o_stat_text">Samples/Ships</span>
                         <span class="o_stat_text text-warning" invisible="active_sample_count == 0">
                             (<field name="active_sample_count"/> active)
                         </span>
                     </div>
                 </button>
                 
-                <!-- Contracts button -->
+                <!-- Contracts button - WITHOUT invoice indicator -->
                 <button name="action_view_contracts" 
                         type="object" 
                         class="oe_stat_button" 
                         icon="fa-file-text-o"
                         invisible="not x_is_evaluation">
-                    <div class="o_field_widget o_stat_info">
-                        <span class="o_stat_value">
-                            <field name="contract_count"/>
-                        </span>
-                        <span class="o_stat_text">Contracts</span>
-                        <span class="o_stat_text text-success" invisible="not has_invoice">
-                            <i class="fa fa-check"/> Invoice
-                        </span>
-                    </div>
+                    <field name="contract_count" widget="statinfo" string="Contracts"/>
                 </button>
                 
                 <!-- Sample payments button -->
@@ -61,7 +54,8 @@
                         type="object" 
                         class="oe_stat_button" 
                         icon="fa-money"
-                        invisible="pending_sample_payments == 0">
+                        invisible="pending_sample_payments == 0"
+                        context="{'search_default_pending_payment': 1}">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_value text-warning">
                             <field name="pending_sample_payments"/>
@@ -75,14 +69,14 @@
             <!-- Add new tabs to notebook -->
             <xpath expr="//notebook" position="inside">
                 
-                <!-- Samples Tab -->
-                <page string="Solicitud de Muestras" 
+                <!-- Samples & Shipments Tab -->
+                <page string="Muestras y Envíos" 
                       invisible="not x_is_request" 
                       name="samples_management">
                     <div class="mb-3">
                         <button name="action_create_sample" 
                                 type="object" 
-                                string="Nueva Muestra" 
+                                string="Nueva Solicitud" 
                                 class="btn-primary"/>
                     </div>
                     
@@ -90,6 +84,7 @@
                            context="{'default_task_id': id}">
                         <kanban>
                             <field name="reference"/>
+                            <field name="tracking_type"/>
                             <field name="supplier_id"/>
                             <field name="state"/>
                             <field name="current_location_id"/>
@@ -97,6 +92,8 @@
                             <field name="has_cost"/>
                             <field name="total_cost"/>
                             <field name="currency_id"/>
+                            <field name="expected_date"/>
+                            <field name="is_overdue"/>
                             <templates>
                                 <t t-name="kanban-box">
                                     <div class="oe_kanban_global_click o_kanban_record_has_image_fill oe_kanban_card">
@@ -110,17 +107,24 @@
                                                         <field name="supplier_id"/>
                                                     </span>
                                                 </div>
-                                                <field name="state" widget="badge" 
-                                                       decoration-secondary="state == 'draft'"
-                                                       decoration-warning="state == 'requested'"
-                                                       decoration-info="state == 'in_transit'"
-                                                       decoration-success="state == 'received'"
-                                                       decoration-danger="state == 'cancelled'"/>
+                                                <div>
+                                                    <span t-if="record.tracking_type.raw_value == 'sample'" 
+                                                          class="badge badge-info">Sample</span>
+                                                    <span t-if="record.tracking_type.raw_value == 'shipment'" 
+                                                          class="badge badge-primary">Shipment</span>
+                                                </div>
                                             </div>
                                             <div class="o_kanban_record_body mt-2">
                                                 <div t-if="record.current_location_id.raw_value">
                                                     <i class="fa fa-map-marker text-muted"/> 
                                                     <span class="text-muted"><field name="current_location_id"/></span>
+                                                </div>
+                                                <div t-if="record.expected_date.raw_value" class="mt-1">
+                                                    <i class="fa fa-calendar text-muted"/> 
+                                                    <span class="text-muted">Expected: <field name="expected_date"/></span>
+                                                    <span t-if="record.is_overdue.raw_value" class="badge badge-danger ml-1">
+                                                        Overdue
+                                                    </span>
                                                 </div>
                                                 <div t-if="record.has_cost.raw_value" class="mt-1">
                                                     <strong>Cost: </strong>
@@ -135,6 +139,14 @@
                                                     </span>
                                                 </div>
                                             </div>
+                                            <div class="o_kanban_record_bottom mt-2">
+                                                <field name="state" widget="badge" 
+                                                       decoration-secondary="state == 'draft'"
+                                                       decoration-warning="state == 'requested'"
+                                                       decoration-info="state == 'in_transit'"
+                                                       decoration-success="state == 'received'"
+                                                       decoration-danger="state == 'cancelled'"/>
+                                            </div>
                                         </div>
                                     </div>
                                 </t>
@@ -142,13 +154,14 @@
                         </kanban>
                     </field>
                     
-                    <group string="Resumen de Muestras" invisible="sample_count == 0">
+                    <group string="Resumen" invisible="sample_count == 0 and shipment_count == 0">
                         <group>
                             <field name="sample_count" string="Total de Muestras"/>
-                            <field name="active_sample_count" string="Muestras Activas"/>
+                            <field name="shipment_count" string="Total de Envíos"/>
+                            <field name="active_sample_count" string="En Tránsito"/>
                         </group>
                         <group>
-                            <field name="total_sample_cost" widget="monetary" string="Costo Total de Muestras"/>
+                            <field name="total_sample_cost" widget="monetary" string="Costo Total"/>
                             <field name="pending_sample_payments" string="Pagos Pendientes"/>
                         </group>
                     </group>

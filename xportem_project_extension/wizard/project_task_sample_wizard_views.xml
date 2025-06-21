@@ -6,14 +6,19 @@
         <field name="name">project.task.sample.wizard.form</field>
         <field name="model">project.task.sample.wizard</field>
         <field name="arch" type="xml">
-            <form string="Create Multiple Sample Requests">
+            <form string="Create Sample/Shipment Requests">
                 <group>
-                    <field name="task_id" readonly="1"/>
+                    <field name="task_id" readonly="1" force_save="1"/>
                 </group>
                 <group>
-                    <group string="Sample Information">
+                    <group string="Type">
+                        <field name="tracking_type" widget="radio_button"/>
+                    </group>
+                </group>
+                <group>
+                    <group string="Information">
                         <field name="sample_description" 
-                               placeholder="Description of the sample..."/>
+                               placeholder="Description of the sample/shipment..."/>
                         <field name="quantity"/>
                         <field name="has_cost"/>
                         <field name="expected_date"/>
@@ -26,11 +31,11 @@
                 </group>
                 <group string="Additional Notes">
                     <field name="notes" nolabel="1" 
-                           placeholder="Notes that will be added to all samples..."/>
+                           placeholder="Notes that will be added to all requests..."/>
                 </group>
                 <footer>
                     <button name="action_create_samples" 
-                            string="Create Samples" 
+                            string="Create Requests" 
                             type="object" 
                             class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
@@ -41,7 +46,7 @@
     
     <!-- Sample Wizard Action -->
     <record id="action_project_task_sample_wizard" model="ir.actions.act_window">
-        <field name="name">Create Multiple Samples</field>
+        <field name="name">Create Multiple Samples/Shipments</field>
         <field name="res_model">project.task.sample.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
