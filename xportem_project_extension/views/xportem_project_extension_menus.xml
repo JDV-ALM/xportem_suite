@@ -1,93 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <!-- ===== OPERATIONAL MENUS ===== -->
-        
-        <!-- Samples Management under Procurement -->
-        <menuitem id="menu_procurement_samples"
-                  name="Gestión de Muestras"
-                  parent="xportem_project.menu_xportem_procurement"
-                  sequence="40"/>
-        
-        <!-- Sample Requests -->
-        <menuitem id="menu_sample_requests"
-                  name="Solicitudes de Muestras"
-                  parent="menu_procurement_samples"
-                  action="action_project_task_sample"
-                  sequence="10"/>
-        
-        <!-- Sample Tracking (filtered view) -->
-        <menuitem id="menu_sample_tracking"
-                  name="Tracking de Muestras"
-                  parent="menu_procurement_samples"
-                  action="action_project_task_sample"
-                  sequence="20"
-                  context="{'search_default_in_transit': 1}"/>
-        
-        <!-- Pending Payments -->
-        <menuitem id="menu_sample_payments"
-                  name="Pagos Pendientes"
-                  parent="menu_procurement_samples"
-                  action="action_project_task_sample"
-                  sequence="30"
-                  context="{'search_default_pending_payment': 1}"/>
-        
-        <!-- Contracts Management under Procurement -->
-        <menuitem id="menu_procurement_contracts"
-                  name="Contratos y Facturas"
-                  parent="xportem_project.menu_xportem_procurement"
-                  action="action_project_task_contract"
-                  sequence="50"/>
-        
-        
-        <!-- ===== CONFIGURATION MENUS ===== -->
-        <!-- Add to existing Xportem > Configuration > Master Data -->
-        
-        <!-- Sample Configuration Section -->
-        <menuitem id="menu_sample_configuration"
-                  name="Configuración de Muestras"
-                  parent="xportem_base.menu_xportem_master_data"
-                  sequence="40"/>
-        
-        <!-- Sample Statuses -->
-        <menuitem id="menu_sample_statuses"
-                  name="Estados de Muestras"
-                  parent="menu_sample_configuration"
-                  action="action_procurement_sample_status"
-                  sequence="10"/>
-        
-        <!-- Shipping Methods -->
-        <menuitem id="menu_shipping_methods"
-                  name="Métodos de Envío"
-                  parent="menu_sample_configuration"
-                  action="action_procurement_shipping_method"
-                  sequence="20"/>
-        
-        <!-- Sample Locations -->
-        <menuitem id="menu_sample_locations"
-                  name="Ubicaciones"
-                  parent="menu_sample_configuration"
-                  action="action_procurement_sample_location"
-                  sequence="30"/>
-        
-        
-        <!-- ===== REPORTING MENUS ===== -->
-        <!-- Add to existing reporting menu -->
-        
-        <!-- Sample Analysis -->
-        <menuitem id="menu_sample_analysis"
-                  name="Análisis de Muestras"
-                  parent="xportem_project.menu_xportem_reporting"
-                  action="action_project_task_sample"
-                  sequence="30"
-                  context="{'search_default_group_supplier': 1}"/>
-        
-        <!-- Contract Analysis -->
-        <menuitem id="menu_contract_analysis"
-                  name="Análisis de Contratos"
-                  parent="xportem_project.menu_xportem_reporting"
-                  action="action_project_task_contract"
-                  sequence="40"
-                  context="{'search_default_group_supplier': 1}"/>
-    </data>
+    <!-- ===== OPERATIONAL MENUS ===== -->
+    
+    <!-- Samples Management under Procurement -->
+    <menuitem id="menu_procurement_samples"
+              name="Gestión de Muestras"
+              parent="xportem_project.menu_xportem_procurement"
+              sequence="40"/>
+    
+    <!-- Sample Requests -->
+    <menuitem id="menu_sample_requests"
+              name="Solicitudes de Muestras"
+              parent="menu_procurement_samples"
+              action="action_project_task_sample"
+              sequence="10"/>
+    
+    <!-- Sample Tracking (filtered view) -->
+    <menuitem id="menu_sample_tracking"
+              name="Tracking de Muestras"
+              parent="menu_procurement_samples"
+              action="action_project_task_sample"
+              sequence="20"
+              context="{'search_default_in_transit': 1}"/>
+    
+    <!-- Pending Payments -->
+    <menuitem id="menu_sample_payments"
+              name="Pagos Pendientes"
+              parent="menu_procurement_samples"
+              action="action_project_task_sample"
+              sequence="30"
+              context="{'search_default_pending_payment': 1}"/>
+    
+    <!-- Contracts Management under Procurement -->
+    <menuitem id="menu_procurement_contracts"
+              name="Contratos y Facturas"
+              parent="xportem_project.menu_xportem_procurement"
+              action="action_project_task_contract"
+              sequence="50"/>
+    
+    
+    <!-- ===== CONFIGURATION MENUS ===== -->
+    <!-- Add to existing Xportem > Configuration > Master Data -->
+    
+    <!-- Sample Configuration Section -->
+    <menuitem id="menu_sample_configuration"
+              name="Configuración de Muestras"
+              parent="xportem_base.menu_xportem_master_data"
+              sequence="40"/>
+    
+    <!-- Sample Statuses -->
+    <menuitem id="menu_sample_statuses"
+              name="Estados de Muestras"
+              parent="menu_sample_configuration"
+              action="action_procurement_sample_status"
+              sequence="10"/>
+    
+    <!-- Shipping Methods -->
+    <menuitem id="menu_shipping_methods"
+              name="Métodos de Envío"
+              parent="menu_sample_configuration"
+              action="action_procurement_shipping_method"
+              sequence="20"/>
+    
+    <!-- Sample Locations -->
+    <menuitem id="menu_sample_locations"
+              name="Ubicaciones"
+              parent="menu_sample_configuration"
+              action="action_procurement_sample_location"
+              sequence="30"/>
+    
+    
+    <!-- ===== REPORTING MENUS ===== -->
+    <!-- Add to existing reporting menu -->
+    
+    <!-- Sample Analysis -->
+    <menuitem id="menu_sample_analysis"
+              name="Análisis de Muestras"
+              parent="xportem_project.menu_xportem_reporting"
+              action="action_project_task_sample"
+              sequence="30"
+              context="{'search_default_group_supplier': 1}"/>
+    
+    <!-- Contract Analysis -->
+    <menuitem id="menu_contract_analysis"
+              name="Análisis de Contratos"
+              parent="xportem_project.menu_xportem_reporting"
+              action="action_project_task_contract"
+              sequence="40"
+              context="{'search_default_group_supplier': 1}"/>
 </odoo>
