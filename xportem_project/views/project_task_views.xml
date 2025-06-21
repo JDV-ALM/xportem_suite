@@ -202,36 +202,6 @@
                         </list>
                     </field>
                 </page>
-                
-                <!-- Purchase Status Tab -->
-                <page string="Estado de Compra" invisible="not x_is_evaluation" name="purchase_status">
-                    <group>
-                        <group string="Aprobación">
-                            <field name="x_approval_status" widget="selection_badge"/>
-                            <button name="action_approve_request" 
-                                    type="object" 
-                                    string="Aprobar" 
-                                    class="btn-success"
-                                    invisible="x_approval_status != 'pending'"/>
-                            <button name="action_reject_request" 
-                                    type="object" 
-                                    string="Rechazar" 
-                                    class="btn-danger"
-                                    invisible="x_approval_status != 'pending'"/>
-                        </group>
-                        <group string="Orden de Compra">
-                            <field name="x_is_purchased"/>
-                            <field name="x_purchase_order_id" 
-                                   invisible="not x_purchase_order_id"
-                                   readonly="1"/>
-                            <button name="action_create_purchase_order" 
-                                    type="object" 
-                                    string="Crear Orden de Compra" 
-                                    class="btn-primary"
-                                    invisible="x_is_purchased or not x_selected_supplier_id or x_approval_status != 'approved'"/>
-                        </group>
-                    </group>
-                </page>
             </xpath>
             
         </field>
