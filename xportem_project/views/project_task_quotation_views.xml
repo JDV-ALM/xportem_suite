@@ -171,7 +171,7 @@
                 <filter string="Alta Calificación" name="high_rating"
                         domain="[('supplier_rating', '>=', 4)]"/>
                 <filter string="Entrega Rápida" name="fast_delivery"
-                        domain="[('lead_time', '&lt;=', 30)]"/>
+                        domain="[('lead_time', '&amp;lt;=', 30)]"/>
                 
                 <group expand="0" string="Agrupar Por">
                     <filter string="Tarea" name="group_task"

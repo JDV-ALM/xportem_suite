@@ -180,7 +180,7 @@
                         domain="[('has_invoice', '=', False), ('state', '!=', 'draft')]"/>
                 <separator/>
                 <filter string="This Month" name="this_month"
-                        domain="[('contract_date','&gt;=',(datetime.date.today()-datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                        domain="[('contract_date','&amp;gt;=',(datetime.date.today()-datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter string="Task" name="group_task"
