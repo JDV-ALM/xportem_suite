@@ -47,35 +47,21 @@ Key Features:
         'xportem_project',
     ],
     'data': [
-        # Security - First
         'security/procurement_security.xml',
         'security/ir.model.access.csv',
-        
-        # Data
         'data/sample_sequence_data.xml',
         'data/procurement_sample_data.xml',
-        # 'data/email_template_data.xml',  # COMENTADO
         'data/cron_data.xml',
-        
-        # Views - Configuration
         'views/procurement_sample_status_views.xml',
         'views/procurement_shipping_method_views.xml',
         'views/procurement_sample_location_views.xml',
-        
-        # Views - Operational
         'views/project_task_sample_views.xml',
         'views/project_task_contract_views.xml',
         'views/project_task_views.xml',
-        
-        # Wizards
         'wizard/project_task_sample_wizard_views.xml',
-        
-        # Reports
         'report/sample_tracking_report.xml',
         'report/contract_report.xml',
-        
-        # Menus - Last
-        #'views/xportem_project_extension_menus.xml',
+        'views/xportem_project_extension_menus.xml',
     ],
     'demo': [],
     'installable': True,
