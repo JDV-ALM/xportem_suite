@@ -255,7 +255,7 @@
         <field name="name">project.task.sample.search</field>
         <field name="model">project.task.sample</field>
         <field name="arch" type="xml">
-            <search string="Search Samples & Shipments">
+            <search string="Search Samples &amp; Shipments">
                 <field name="reference"/>
                 <field name="task_id"/>
                 <field name="supplier_id"/>
@@ -277,16 +277,6 @@
                 <separator/>
                 <filter string="Has Cost" name="has_cost"
                         domain="[('has_cost', '=', True)]"/>
-                <filter string="Current Month" name="current_month"
-                        domain="[
-                            ('request_date', '&amp;gt;=', context_today().replace(day=1).strftime('%Y-%m-%d')),
-                            ('request_date', '&amp;lt;', (context_today().replace(day=1) + relativedelta(months=1)).strftime('%Y-%m-%d'))
-                        ]"/>
-                <filter string="Last Month" name="last_month"
-                        domain="[
-                            ('request_date', '&amp;gt;=', (context_today().replace(day=1) - relativedelta(months=1)).strftime('%Y-%m-%d')),
-                            ('request_date', '&amp;lt;', context_today().replace(day=1).strftime('%Y-%m-%d'))
-                        ]"/>
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter string="Type" name="group_type"
