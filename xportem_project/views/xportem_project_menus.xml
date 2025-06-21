@@ -1,77 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Samples Management under Procurement -->
-    <menuitem id="menu_procurement_samples"
-              name="Gestión de Muestras"
-              parent="xportem_project.menu_xportem_procurement"
-              sequence="40"/>
     
-    <!-- Sample Requests -->
-    <menuitem id="menu_sample_requests"
-              name="Solicitudes de Muestras"
-              parent="menu_procurement_samples"
-              action="action_project_task_sample"
-              sequence="10"/>
+    <!-- Menu items under Xportem root -->
     
-    <!-- Sample Tracking (filtered view) -->
-    <menuitem id="menu_sample_tracking"
-              name="Tracking de Muestras"
-              parent="menu_procurement_samples"
-              action="action_project_task_sample"
+    <!-- Procurement Operations submenu -->
+    <menuitem id="menu_xportem_procurement"
+              name="Procura Internacional"
+              parent="xportem_base.menu_xportem_root"
               sequence="20"/>
     
-    <!-- Pending Payments -->
-    <menuitem id="menu_sample_payments"
-              name="Pagos Pendientes"
-              parent="menu_procurement_samples"
-              action="action_project_task_sample"
-              sequence="30"/>
-    
-    <!-- Contracts Management under Procurement -->
-    <menuitem id="menu_procurement_contracts"
-              name="Contratos y Facturas"
-              parent="xportem_project.menu_xportem_procurement"
-              action="action_project_task_contract"
-              sequence="50"/>
-    
-    <!-- Sample Configuration Section -->
-    <menuitem id="menu_sample_configuration"
-              name="Configuración de Muestras"
-              parent="xportem_base.menu_xportem_master_data"
-              sequence="40"/>
-    
-    <!-- Sample Statuses -->
-    <menuitem id="menu_sample_statuses"
-              name="Estados de Muestras"
-              parent="menu_sample_configuration"
-              action="action_procurement_sample_status"
+    <!-- Procurement Projects (Clients) -->
+    <menuitem id="menu_procurement_projects"
+              name="Clientes"
+              parent="menu_xportem_procurement"
+              action="action_procurement_projects"
               sequence="10"/>
     
-    <!-- Shipping Methods -->
-    <menuitem id="menu_shipping_methods"
-              name="Métodos de Envío"
-              parent="menu_sample_configuration"
-              action="action_procurement_shipping_method"
+    <!-- Procurement Requests (Tasks) -->
+    <menuitem id="menu_procurement_requests"
+              name="Solicitudes"
+              parent="menu_xportem_procurement"
+              action="action_procurement_requests"
               sequence="20"/>
     
-    <!-- Sample Locations -->
-    <menuitem id="menu_sample_locations"
-              name="Ubicaciones"
-              parent="menu_sample_configuration"
-              action="action_procurement_sample_location"
+    <!-- Quotations -->
+    <menuitem id="menu_procurement_quotations"
+              name="Cotizaciones"
+              parent="menu_xportem_procurement"
+              action="action_project_task_quotation_lines"
               sequence="30"/>
     
-    <!-- Sample Analysis -->
-    <menuitem id="menu_sample_analysis"
-              name="Análisis de Muestras"
-              parent="xportem_project.menu_xportem_reporting"
-              action="action_project_task_sample"
-              sequence="30"/>
+    <!-- Technical Specifications -->
+    <menuitem id="menu_procurement_technical_specs"
+              name="Especificaciones Técnicas"
+              parent="menu_xportem_procurement"
+              action="action_project_task_technical_specs"
+              sequence="35"/>
     
-    <!-- Contract Analysis -->
-    <menuitem id="menu_contract_analysis"
-              name="Análisis de Contratos"
-              parent="xportem_project.menu_xportem_reporting"
-              action="action_project_task_contract"
-              sequence="40"/>
+    <!-- Reporting submenu -->
+    <menuitem id="menu_xportem_reporting"
+              name="Reportes"
+              parent="menu_xportem_procurement"
+              sequence="80"/>
+    
+    <!-- Tasks Analysis -->
+    <menuitem id="menu_procurement_tasks_analysis"
+              name="Análisis de Solicitudes"
+              parent="menu_xportem_reporting"
+              action="project.action_view_all_task"
+              sequence="10"/>
+    
+    <!-- Quotations Analysis -->
+    <menuitem id="menu_procurement_quotations_analysis"
+              name="Análisis de Cotizaciones"
+              parent="menu_xportem_reporting"
+              action="action_project_task_quotation_lines"
+              sequence="20"/>
+    
 </odoo>
