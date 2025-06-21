@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 
@@ -89,7 +89,7 @@ class ProcurementSampleStatus(models.Model):
             ])
             if initial_count > 0:
                 raise ValidationError(
-                    self.env._('Only one status can be marked as initial.')
+                    _('Only one status can be marked as initial.')
                 )
     
     def name_get(self):

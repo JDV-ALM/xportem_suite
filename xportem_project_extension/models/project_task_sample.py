@@ -270,7 +270,7 @@ class ProjectTaskSample(models.Model):
             self.shipping_cost = 0.0
     
     def action_request(self):
-        """Mark sample as requested and send email"""
+        """Mark sample as requested"""
         self.ensure_one()
         self.state = 'requested'
         
@@ -284,10 +284,11 @@ class ProjectTaskSample(models.Model):
                 'notes': 'Sample requested from supplier'
             })
         
+        # EMAIL TEMPLATE COMMENTED OUT
         # Send email to supplier
-        template = self.env.ref('xportem_project_extension.email_template_sample_request', False)
-        if template:
-            template.send_mail(self.id, force_send=True)
+        # template = self.env.ref('xportem_project_extension.email_template_sample_request', False)
+        # if template:
+        #     template.send_mail(self.id, force_send=True)
         
         # Create activity for follow-up
         self.activity_schedule(
@@ -301,11 +302,11 @@ class ProjectTaskSample(models.Model):
         """Mark sample as in transit"""
         self.ensure_one()
         if not self.shipping_method_id:
-            raise ValidationError(self.env._('Please select a shipping method before marking as in transit.'))
+            raise ValidationError(_('Please select a shipping method before marking as in transit.'))
         self.state = 'in_transit'
     
     def action_mark_received(self):
-        """Mark sample as received and send notification"""
+        """Mark sample as received"""
         self.ensure_one()
         self.write({
             'state': 'received',
@@ -315,10 +316,11 @@ class ProjectTaskSample(models.Model):
         # Mark activities as done
         self.activity_ids.action_done()
         
+        # EMAIL TEMPLATE COMMENTED OUT
         # Send notification email
-        template = self.env.ref('xportem_project_extension.email_template_sample_received', False)
-        if template:
-            template.send_mail(self.id, force_send=True)
+        # template = self.env.ref('xportem_project_extension.email_template_sample_received', False)
+        # if template:
+        #     template.send_mail(self.id, force_send=True)
     
     def action_cancel(self):
         """Cancel sample request"""
@@ -330,14 +332,14 @@ class ProjectTaskSample(models.Model):
         """Mark sample as paid"""
         self.ensure_one()
         if not self.has_cost:
-            raise ValidationError(self.env._('This sample does not require payment.'))
+            raise ValidationError(_('This sample does not require payment.'))
         self.payment_state = 'paid'
     
     def action_view_tracking(self):
         """View tracking history"""
         self.ensure_one()
         return {
-            'name': self.env._('Sample Tracking History'),
+            'name': _('Sample Tracking History'),
             'type': 'ir.actions.act_window',
             'res_model': 'project.task.sample.tracking',
             'view_mode': 'list,form',
@@ -354,7 +356,7 @@ class ProjectTaskSample(models.Model):
         """Quick add tracking update"""
         self.ensure_one()
         return {
-            'name': self.env._('Add Tracking Update'),
+            'name': _('Add Tracking Update'),
             'type': 'ir.actions.act_window',
             'res_model': 'project.task.sample.tracking',
             'view_mode': 'form',

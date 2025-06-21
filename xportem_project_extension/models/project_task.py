@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 
@@ -105,7 +105,7 @@ class ProjectTask(models.Model):
         self.ensure_one()
         
         return {
-            'name': self.env._('Product Samples - %s') % self.name,
+            'name': _('Product Samples - %s') % self.name,
             'type': 'ir.actions.act_window',
             'res_model': 'project.task.sample',
             'view_mode': 'list,form,kanban',
@@ -121,7 +121,7 @@ class ProjectTask(models.Model):
         self.ensure_one()
         
         return {
-            'name': self.env._('New Sample Request'),
+            'name': _('New Sample Request'),
             'type': 'ir.actions.act_window',
             'res_model': 'project.task.sample',
             'view_mode': 'form',
@@ -138,7 +138,7 @@ class ProjectTask(models.Model):
         self.ensure_one()
         
         return {
-            'name': self.env._('Contracts & Invoices - %s') % self.name,
+            'name': _('Contracts & Invoices - %s') % self.name,
             'type': 'ir.actions.act_window',
             'res_model': 'project.task.contract',
             'view_mode': 'list,form',
@@ -155,11 +155,11 @@ class ProjectTask(models.Model):
         
         if not self.x_selected_supplier_id:
             raise ValidationError(
-                self.env._('Please select a supplier before creating a contract.')
+                _('Please select a supplier before creating a contract.')
             )
         
         return {
-            'name': self.env._('New Contract'),
+            'name': _('New Contract'),
             'type': 'ir.actions.act_window',
             'res_model': 'project.task.contract',
             'view_mode': 'form',

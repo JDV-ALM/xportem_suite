@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 
@@ -91,7 +91,7 @@ class ProjectTaskSampleTracking(models.Model):
         for tracking in self:
             if tracking.requires_location and not tracking.location_id:
                 raise ValidationError(
-                    self.env._('Location is required for status: %s') % tracking.status_id.name
+                    _('Location is required for status: %s') % tracking.status_id.name
                 )
     
     @api.constrains('shipping_method_id', 'status_id')
@@ -100,7 +100,7 @@ class ProjectTaskSampleTracking(models.Model):
         for tracking in self:
             if tracking.requires_shipping_method and not tracking.shipping_method_id:
                 raise ValidationError(
-                    self.env._('Shipping method is required for status: %s') % tracking.status_id.name
+                    _('Shipping method is required for status: %s') % tracking.status_id.name
                 )
     
     @api.model_create_multi

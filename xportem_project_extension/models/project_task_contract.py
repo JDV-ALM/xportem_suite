@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 
@@ -170,7 +170,7 @@ class ProjectTaskContract(models.Model):
         for contract in self:
             if contract.selected_supplier_id and contract.supplier_id != contract.selected_supplier_id:
                 raise ValidationError(
-                    self.env._('Contract supplier must match the selected supplier in the task.')
+                    _('Contract supplier must match the selected supplier in the task.')
                 )
     
     @api.constrains('invoice_amount', 'contract_amount')
@@ -204,7 +204,7 @@ class ProjectTaskContract(models.Model):
         """Mark contract as signed"""
         self.ensure_one()
         if not self.contract_file:
-            raise ValidationError(self.env._('Please upload the contract file before marking as signed.'))
+            raise ValidationError(_('Please upload the contract file before marking as signed.'))
         self.state = 'signed'
     
     def action_complete(self):
