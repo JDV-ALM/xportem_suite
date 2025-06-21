@@ -149,11 +149,10 @@
         <field name="name">project.task.sample.list</field>
         <field name="model">project.task.sample</field>
         <field name="arch" type="xml">
-            <list string="Samples & Shipments" default_order="create_date desc"
+            <list string="Samples &amp; Shipments" default_order="create_date desc"
                   decoration-success="state=='received'"
                   decoration-warning="state=='in_transit'"
-                  decoration-muted="state=='cancelled'"
-                  decoration-danger="is_overdue==True">
+                  decoration-muted="state=='cancelled'">
                 <field name="reference"/>
                 <field name="tracking_type" widget="badge"
                        decoration-info="tracking_type=='sample'"
@@ -272,8 +271,6 @@
                         domain="[('state', '=', 'in_transit')]"/>
                 <filter string="Received" name="received"
                         domain="[('state', '=', 'received')]"/>
-                <filter string="Overdue" name="overdue"
-                        domain="[('is_overdue', '=', True)]"/>
                 <separator/>
                 <filter string="Has Cost" name="has_cost"
                         domain="[('has_cost', '=', True)]"/>
@@ -300,7 +297,7 @@
     
     <!-- Sample Action - Updated -->
     <record id="action_project_task_sample" model="ir.actions.act_window">
-        <field name="name">Samples & Shipments</field>
+        <field name="name">Samples &amp; Shipments</field>
         <field name="res_model">project.task.sample</field>
         <field name="view_mode">list,kanban,form</field>
         <field name="search_view_id" ref="view_project_task_sample_search"/>
