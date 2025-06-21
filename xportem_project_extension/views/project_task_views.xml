@@ -81,8 +81,9 @@
                     </div>
                     
                     <field name="sample_ids" mode="kanban"
-                           context="{'default_task_id': id}">
-                        <kanban>
+                           context="{'default_task_id': id}"
+                           readonly="1">
+                        <kanban create="0">
                             <field name="reference"/>
                             <field name="tracking_type"/>
                             <field name="supplier_id"/>

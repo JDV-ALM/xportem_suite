@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from datetime import timedelta
 
@@ -328,8 +328,27 @@ class ProjectTaskSample(models.Model):
         """Mark as in transit"""
         self.ensure_one()
         if not self.shipping_method_id:
-            raise ValidationError(_('Please select a shipping method before marking as in transit.'))
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Missing Shipping Method',
+                    'message': 'Please select a shipping method before marking as in transit.',
+                    'type': 'warning',
+                    'sticky': False,
+                }
+            }
         self.state = 'in_transit'
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Status Updated',
+                'message': 'The shipment is now in transit.',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     
     def action_mark_received(self):
         """Mark as received"""
@@ -352,7 +371,7 @@ class ProjectTaskSample(models.Model):
         """Mark as paid"""
         self.ensure_one()
         if not self.has_cost:
-            raise ValidationError(_('This %s does not require payment.') % self.type_display.lower())
+            raise ValidationError('This %s does not require payment.' % self.type_display.lower())
         self.payment_state = 'paid'
     
     def action_view_tracking(self):
