@@ -7,6 +7,7 @@ from odoo.exceptions import ValidationError
 class ProjectTaskContract(models.Model):
     _name = 'project.task.contract'
     _description = 'Task Purchase Contract and Invoice'
+    _inherit = ['mail.thread', 'mail.activity.mixin']  # AÑADIDO
     _order = 'create_date desc'
     _rec_name = 'contract_reference'
     
@@ -24,21 +25,24 @@ class ProjectTaskContract(models.Model):
         string='Supplier',
         required=True,
         domain=[('x_is_china_supplier', '=', True)],
-        help='Selected supplier for this purchase'
+        help='Selected supplier for this purchase',
+        tracking=True  # AÑADIDO
     )
     
     # Contract Information
     contract_reference = fields.Char(
         string='Contract Reference',
         required=True,
-        help='Contract number or reference'
+        help='Contract number or reference',
+        tracking=True  # AÑADIDO
     )
     
     contract_date = fields.Date(
         string='Contract Date',
         required=True,
         default=fields.Date.today,
-        help='Date when contract was signed'
+        help='Date when contract was signed',
+        tracking=True  # AÑADIDO
     )
     
     contract_file = fields.Binary(
@@ -55,7 +59,8 @@ class ProjectTaskContract(models.Model):
         string='Contract Amount',
         currency_field='currency_id',
         required=True,
-        help='Total contract value'
+        help='Total contract value',
+        tracking=True  # AÑADIDO
     )
     
     currency_id = fields.Many2one(
@@ -73,7 +78,8 @@ class ProjectTaskContract(models.Model):
     # Invoice Information
     has_invoice = fields.Boolean(
         string='Has Invoice',
-        help='Check when invoice is received'
+        help='Check when invoice is received',
+        tracking=True  # AÑADIDO
     )
     
     invoice_number = fields.Char(
