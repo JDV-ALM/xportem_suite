@@ -75,7 +75,7 @@ Key Features:
         'report/contract_report.xml',
         
         # Menus - Last
-        'views/xportem_project_extension_menus.xml',
+        #'views/xportem_project_extension_menus.xml',
     ],
     'demo': [],
     'installable': True,
