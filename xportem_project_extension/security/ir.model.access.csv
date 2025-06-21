@@ -11,3 +11,5 @@ access_project_task_sample_tracking_user,project.task.sample.tracking.user,model
 access_project_task_sample_tracking_portal,project.task.sample.tracking.portal,model_project_task_sample_tracking,base.group_portal,1,0,0,0
 access_project_task_contract_user,project.task.contract.user,model_project_task_contract,base.group_user,1,1,1,1
 access_project_task_contract_portal,project.task.contract.portal,model_project_task_contract,base.group_portal,1,0,0,0
+access_project_task_sample_wizard_user,project.task.sample.wizard.user,model_project_task_sample_wizard,base.group_user,1,1,1,1
+access_project_task_sample_wizard_procurement_user,project.task.sample.wizard.procurement.user,model_project_task_sample_wizard,xportem_project_extension.group_procurement_user,1,1,1,1
