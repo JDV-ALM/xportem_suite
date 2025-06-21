@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Sample Tracking Report -->
-    <report id="report_sample_tracking"
-            model="project.task.sample"
-            string="Sample Tracking Report"
-            report_type="qweb-pdf"
-            name="xportem_project_extension.report_sample_tracking_document"
-            file="xportem_project_extension.report_sample_tracking_document"
-            print_report_name="'Sample Tracking - %s' % (object.reference)"
-    />
+    <record id="report_sample_tracking" model="ir.actions.report">
+        <field name="name">Sample Tracking Report</field>
+        <field name="model">project.task.sample</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">xportem_project_extension.report_sample_tracking_document</field>
+        <field name="report_file">xportem_project_extension.report_sample_tracking_document</field>
+        <field name="print_report_name">'Sample Tracking - %s' % (object.reference)</field>
+        <field name="binding_model_id" ref="model_project_task_sample"/>
+        <field name="binding_type">report</field>
+    </record>
     
     <!-- Report Template -->
     <template id="report_sample_tracking_document">

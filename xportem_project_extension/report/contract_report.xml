@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    
     <!-- Contract Report -->
-    <report id="report_task_contract"
-            model="project.task.contract"
-            string="Contract Summary"
-            report_type="qweb-pdf"
-            name="xportem_project_extension.report_contract_document"
-            file="xportem_project_extension.report_contract_document"
-            print_report_name="'Contract - %s' % (object.contract_reference)"
-    />
+    <record id="report_task_contract" model="ir.actions.report">
+        <field name="name">Contract Summary</field>
+        <field name="model">project.task.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">xportem_project_extension.report_contract_document</field>
+        <field name="report_file">xportem_project_extension.report_contract_document</field>
+        <field name="print_report_name">'Contract - %s' % (object.contract_reference)</field>
+        <field name="binding_model_id" ref="model_project_task_contract"/>
+        <field name="binding_type">report</field>
+    </record>
     
     <!-- Contract Report Template -->
     <template id="report_contract_document">
@@ -184,5 +185,4 @@
             </t>
         </t>
     </template>
-    
 </odoo>
