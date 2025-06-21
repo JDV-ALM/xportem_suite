@@ -283,6 +283,24 @@ class ProjectTaskContract(models.Model):
             'target': 'new',
         }
     
+    def unlink(self):
+        """Override to restrict deletion to administrators only"""
+        if not self.env.user.has_group('base.group_system'):
+            raise ValidationError(_('Only administrators can delete contracts.'))
+        return super().unlink()
+    
+    def action_delete_contract(self):
+        """Delete contract - only for administrators"""
+        self.ensure_one()
+        if not self.env.user.has_group('base.group_system'):
+            raise ValidationError(_('Only administrators can delete contracts.'))
+        
+        # Confirm dialog will be shown by the client
+        return {
+            'type': 'ir.actions.act_window_close',
+            'infos': {'force_reload': True},
+        }
+    
     def name_get(self):
         """Display name with reference and supplier"""
         result = []

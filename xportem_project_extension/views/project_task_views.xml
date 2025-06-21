@@ -180,7 +180,7 @@
                     
                     <field name="contract_ids" 
                            context="{'default_task_id': id}">
-                        <list string="Contratos" editable="bottom">
+                        <list string="Contratos" delete="0">
                             <field name="contract_reference"/>
                             <field name="supplier_id"/>
                             <field name="contract_date"/>

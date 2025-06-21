@@ -131,10 +131,6 @@
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" groups="base.group_user"/>
-                    <field name="message_ids"/>
-                </div>
             </form>
         </field>
     </record>
@@ -144,7 +140,7 @@
         <field name="name">project.task.contract.list</field>
         <field name="model">project.task.contract</field>
         <field name="arch" type="xml">
-            <list string="Contracts &amp; Invoices" default_order="create_date desc">
+            <list string="Contracts &amp; Invoices" default_order="create_date desc" delete="0">
                 <field name="contract_reference"/>
                 <field name="task_id"/>
                 <field name="supplier_id"/>
@@ -180,7 +176,7 @@
                         domain="[('has_invoice', '=', False), ('state', '!=', 'draft')]"/>
                 <separator/>
                 <filter string="This Month" name="this_month"
-                        domain="[('contract_date','&amp;gt;=',(datetime.date.today()-datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                        domain="[('contract_date','&gt;=',(datetime.date.today()-datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
                 <group expand="0" string="Group By">
                     <filter string="Task" name="group_task"
@@ -210,6 +206,40 @@
                 Manage purchase contracts and invoices for your procurement tasks,
                 including document storage and tracking.
             </p>
+        </field>
+    </record>
+    
+    <!-- Server Action for Delete Contract -->
+    <record id="action_delete_contract_server" model="ir.actions.server">
+        <field name="name">Delete Contract</field>
+        <field name="model_id" ref="model_project_task_contract"/>
+        <field name="binding_model_id" ref="model_project_task_contract"/>
+        <field name="binding_view_types">form</field>
+        <field name="groups_id" eval="[(4, ref('base.group_system'))]"/>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    # Check if user is admin
+    if not env.user.has_group('base.group_system'):
+        raise UserError('Only administrators can delete contracts.')
+    
+    # Get contract info before deletion
+    contract_ref = records.contract_reference
+    
+    # Delete the contract
+    records.unlink()
+    
+    # Return notification
+    action = {
+        'type': 'ir.actions.client',
+        'tag': 'display_notification',
+        'params': {
+            'title': 'Contract Deleted',
+            'message': 'Contract %s has been deleted.' % contract_ref,
+            'type': 'success',
+            'sticky': False,
+        }
+    }
         </field>
     </record>
     
