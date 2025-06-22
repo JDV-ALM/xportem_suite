@@ -7,10 +7,12 @@ from odoo.exceptions import ValidationError
 class ProjectTask(models.Model):
     _inherit = 'project.task'
     
-    # Sample/Shipment Management Fields
-    sample_ids = fields.One2many(
+    # Sample/Shipment Management Fields - UPDATED
+    sample_ids = fields.Many2many(
         'project.task.sample',
+        'project_task_sample_task_rel',
         'task_id',
+        'sample_id',
         string='Samples & Shipments'
     )
     
@@ -32,10 +34,12 @@ class ProjectTask(models.Model):
         store=False
     )
     
-    # Contract Management Fields
-    contract_ids = fields.One2many(
+    # Contract Management Fields - UPDATED
+    contract_ids = fields.Many2many(
         'project.task.contract',
+        'project_task_contract_task_rel',
         'task_id',
+        'contract_id',
         string='Contracts & Invoices'
     )
     
@@ -119,9 +123,9 @@ class ProjectTask(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'project.task.sample',
             'view_mode': 'list,form,kanban',
-            'domain': [('task_id', '=', self.id)],
+            'domain': [('task_ids', 'in', self.id)],
             'context': {
-                'default_task_id': self.id,
+                'default_task_ids': [(6, 0, [self.id])],
                 'default_supplier_id': self.x_selected_supplier_id.id if self.x_selected_supplier_id else False,
                 'search_default_group_type': 1,
             }
@@ -140,7 +144,7 @@ class ProjectTask(models.Model):
             'target': 'new',
             'context': {
                 'active_id': self.id,
-                'default_task_id': self.id,
+                'default_task_ids': [(6, 0, [self.id])],
                 'default_sample_description': self.x_product_display_name or '',
                 'default_supplier_ids': [(6, 0, self.x_potential_supplier_ids.ids)] if self.x_potential_supplier_ids else False,
             }
@@ -155,9 +159,9 @@ class ProjectTask(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'project.task.contract',
             'view_mode': 'list,form',
-            'domain': [('task_id', '=', self.id)],
+            'domain': [('task_ids', 'in', self.id)],
             'context': {
-                'default_task_id': self.id,
+                'default_task_ids': [(6, 0, [self.id])],
                 'default_supplier_id': self.x_selected_supplier_id.id if self.x_selected_supplier_id else False,
             }
         }
@@ -177,7 +181,7 @@ class ProjectTask(models.Model):
             'res_model': 'project.task.contract',
             'view_mode': 'form',
             'context': {
-                'default_task_id': self.id,
+                'default_task_ids': [(6, 0, [self.id])],
                 'default_supplier_id': default_supplier.id if default_supplier else False,
                 'default_purchase_order_id': self.x_purchase_order_id.id if self.x_purchase_order_id else False,
             },

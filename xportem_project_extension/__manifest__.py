@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Xportem Project Extension',
-    'version': '18.0.1.0.1',
+    'version': '18.0.1.0.2',
     'category': 'Xportem/Project',
     'summary': 'Extensions for procurement: samples tracking and contracts management',
     'description': """
@@ -18,6 +18,7 @@ Samples Management:
 * Configurable status checklist
 * Tracking reports
 * Bulk sample creation wizard
+* Support for multiple tasks per sample/shipment
 
 Contracts and Invoices:
 ----------------------
@@ -25,6 +26,7 @@ Contracts and Invoices:
 * Invoice tracking
 * Integration with selected suppliers
 * Contract summary reports
+* Support for multiple tasks per contract
 
 Key Features:
 -------------
@@ -36,6 +38,7 @@ Key Features:
 * PDF reports
 * Security groups
 * Automated overdue checks
+* Many-to-many relationships for samples and contracts
     """,
     'author': 'Xportem',
     'website': 'https://www.xportem.com',

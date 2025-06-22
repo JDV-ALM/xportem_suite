@@ -32,13 +32,15 @@
                     
                     <group>
                         <group string="General Information">
-                            <field name="task_id" readonly="state != 'draft'" force_save="1"/>
-                            <field name="product_display_name"/>
+                            <field name="task_ids" widget="many2many_tags" 
+                                   readonly="state != 'draft'"
+                                   options="{'no_create': True}"
+                                   domain="[('x_is_request', '=', True)]"/>
+                            <field name="products_display" string="Products"/>
                             <field name="supplier_id" 
                                    readonly="state != 'draft'"
                                    required="1"
                                    context="{'default_x_is_china_supplier': True}"/>
-                            <field name="selected_supplier_id" invisible="1"/>
                         </group>
                         <group string="Contract Details">
                             <field name="contract_date" readonly="state != 'draft'"/>
@@ -122,6 +124,16 @@
                     </group>
                     
                     <notebook>
+                        <page string="Related Tasks" name="tasks">
+                            <field name="task_ids" readonly="1">
+                                <list string="Tasks Included">
+                                    <field name="name"/>
+                                    <field name="x_product_display_name"/>
+                                    <field name="x_selected_supplier_id"/>
+                                    <field name="stage_id"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Additional Documents" name="documents">
                             <field name="attachment_ids" widget="many2many_binary" nolabel="1"/>
                         </page>
@@ -142,7 +154,7 @@
         <field name="arch" type="xml">
             <list string="Contracts &amp; Invoices" default_order="create_date desc" delete="0">
                 <field name="contract_reference"/>
-                <field name="task_id"/>
+                <field name="products_display" string="Products"/>
                 <field name="supplier_id"/>
                 <field name="contract_date"/>
                 <field name="contract_amount" widget="monetary" sum="Total"/>
@@ -164,7 +176,7 @@
         <field name="arch" type="xml">
             <search string="Search Contracts">
                 <field name="contract_reference"/>
-                <field name="task_id"/>
+                <field name="task_ids"/>
                 <field name="supplier_id"/>
                 <field name="invoice_number"/>
                 <separator/>
@@ -179,8 +191,6 @@
                         domain="[('contract_date','&gt;=',(datetime.date.today()-datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
                 <group expand="0" string="Group By">
-                    <filter string="Task" name="group_task"
-                            context="{'group_by': 'task_id'}"/>
                     <filter string="Supplier" name="group_supplier"
                             context="{'group_by': 'supplier_id'}"/>
                     <filter string="Status" name="group_state"

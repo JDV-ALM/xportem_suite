@@ -12,12 +12,15 @@ class ProjectTaskContract(models.Model):
     _rec_name = 'contract_reference'
     
     # Basic Information
-    task_id = fields.Many2one(
+    # CHANGED: Many2one to Many2many
+    task_ids = fields.Many2many(
         'project.task',
-        string='Related Task',
+        'project_task_contract_task_rel',
+        'contract_id',
+        'task_id',
+        string='Related Tasks',
         required=True,
-        ondelete='cascade',
-        help='Task for this contract'
+        help='Tasks for this contract'
     )
     
     supplier_id = fields.Many2one(
@@ -134,24 +137,18 @@ class ProjectTaskContract(models.Model):
         ('cancelled', 'Cancelled')
     ], string='Status', default='draft', tracking=True)
     
-    # Related fields
-    project_id = fields.Many2one(
-        related='task_id.project_id',
-        string='Project',
-        store=True,
+    # Related fields - UPDATED for Many2many
+    project_ids = fields.Many2many(
+        related='task_ids.project_id',
+        string='Projects',
         readonly=True
     )
     
-    product_display_name = fields.Char(
-        related='task_id.x_product_display_name',
-        string='Product',
-        readonly=True
-    )
-    
-    selected_supplier_id = fields.Many2one(
-        related='task_id.x_selected_supplier_id',
-        string='Task Selected Supplier',
-        readonly=True
+    # NEW: Computed field to show all products
+    products_display = fields.Char(
+        string='Products',
+        compute='_compute_products_display',
+        store=False
     )
     
     # Additional Documents
@@ -170,14 +167,19 @@ class ProjectTaskContract(models.Model):
         help='Additional notes about this contract'
     )
     
-    @api.constrains('supplier_id', 'selected_supplier_id')
-    def _check_supplier_consistency(self):
-        """Ensure contract supplier matches task selected supplier IF one is selected"""
+    @api.depends('task_ids.x_product_display_name')
+    def _compute_products_display(self):
+        """Compute display of all products from tasks"""
         for contract in self:
-            # Only validate if task has a selected supplier
-            if contract.selected_supplier_id and contract.supplier_id != contract.selected_supplier_id:
-                # Warning instead of hard error
-                pass
+            products = contract.task_ids.mapped('x_product_display_name')
+            products = [p for p in products if p]  # Filter empty values
+            if products:
+                if len(products) <= 3:
+                    contract.products_display = ', '.join(products)
+                else:
+                    contract.products_display = ', '.join(products[:3]) + f' (+{len(products) - 3} more)'
+            else:
+                contract.products_display = ''
     
     @api.constrains('invoice_amount', 'contract_amount')
     def _check_invoice_amount(self):
@@ -198,12 +200,29 @@ class ProjectTaskContract(models.Model):
     
     @api.model_create_multi
     def create(self, vals_list):
-        """Set supplier from task if not provided"""
+        """Set supplier from tasks if not provided"""
         for vals in vals_list:
-            if 'supplier_id' not in vals and vals.get('task_id'):
-                task = self.env['project.task'].browse(vals['task_id'])
-                if task.x_selected_supplier_id:
-                    vals['supplier_id'] = task.x_selected_supplier_id.id
+            if 'supplier_id' not in vals and vals.get('task_ids'):
+                # Get task_ids from the many2many command
+                task_ids = []
+                if isinstance(vals['task_ids'][0], (list, tuple)) and vals['task_ids'][0][0] == 6:
+                    task_ids = vals['task_ids'][0][2]
+                elif isinstance(vals['task_ids'][0], (list, tuple)) and vals['task_ids'][0][0] == 4:
+                    # Handle [(4, id), ...] format
+                    task_ids = [cmd[1] for cmd in vals['task_ids'] if cmd[0] == 4]
+                
+                if task_ids:
+                    tasks = self.env['project.task'].browse(task_ids)
+                    # Get the most common selected supplier from tasks
+                    suppliers = tasks.mapped('x_selected_supplier_id')
+                    if suppliers:
+                        # Use the most frequent supplier
+                        supplier_counts = {}
+                        for supplier in suppliers:
+                            supplier_counts[supplier.id] = supplier_counts.get(supplier.id, 0) + 1
+                        most_common = max(supplier_counts, key=supplier_counts.get)
+                        vals['supplier_id'] = most_common
+                        
         return super().create(vals_list)
     
     def action_sign_contract(self):
@@ -305,6 +324,10 @@ class ProjectTaskContract(models.Model):
         """Display name with reference and supplier"""
         result = []
         for contract in self:
-            name = f"{contract.contract_reference} - {contract.supplier_id.name}"
+            # Show products info if multiple
+            if len(contract.task_ids) > 1:
+                name = f"{contract.contract_reference} - {contract.supplier_id.name} ({len(contract.task_ids)} products)"
+            else:
+                name = f"{contract.contract_reference} - {contract.supplier_id.name}"
             result.append((contract.id, name))
         return result

@@ -8,7 +8,12 @@
         <field name="arch" type="xml">
             <form string="Create Sample/Shipment Requests">
                 <group>
-                    <field name="task_id" readonly="1" force_save="1"/>
+                    <field name="task_ids" widget="many2many_tags"
+                           options="{'no_create': True}"
+                           domain="[('x_is_request', '=', True)]"/>
+                </group>
+                <group string="Products to Include">
+                    <field name="products_summary" nolabel="1" readonly="1"/>
                 </group>
                 <group>
                     <group string="Type">
@@ -27,6 +32,9 @@
                         <field name="supplier_ids" widget="many2many_tags"
                                options="{'no_create': True}"
                                placeholder="Select suppliers..."/>
+                        <div class="text-muted">
+                            <i class="fa fa-info-circle"/> One request will be created per supplier
+                        </div>
                     </group>
                 </group>
                 <group string="Additional Notes">
