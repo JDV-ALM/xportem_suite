@@ -12,7 +12,7 @@ This module extends xportem_project with additional features:
 
 Samples Management:
 ------------------
-* Complete sample tracking from request to delivery
+* Complete tracking from request to delivery
 * Multiple shipping methods and locations
 * Sample quotations and payment tracking
 * Configurable status checklist
