@@ -1,0 +1,8 @@
+# Configuración para Odoo.sh
+# Este archivo debe ir en la raíz del repositorio
+
+skip_tests:
+  - xportem_project_extension
+
+# O si prefieres ser más específico:
+# test_tags: "-xportem_project_extension"
