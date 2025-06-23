@@ -27,13 +27,15 @@ class ProjectTaskSample(models.Model):
         ('shipment', 'Final Shipment')
     ], string='Type', default='sample', required=True, tracking=True)
     
-    task_id = fields.Many2one(
+    # CHANGED: Many2one to Many2many
+    task_ids = fields.Many2many(
         'project.task',
-        string='Related Task',
+        'project_task_sample_task_rel',
+        'sample_id',
+        'task_id',
+        string='Related Tasks',
         required=True,
-        ondelete='cascade',
-        index=True,
-        help='Task requesting this sample/shipment'
+        help='Tasks requesting this sample/shipment'
     )
     
     supplier_id = fields.Many2one(
@@ -169,18 +171,19 @@ class ProjectTaskSample(models.Model):
         help='Additional notes'
     )
     
-    # Related fields
-    project_id = fields.Many2one(
-        related='task_id.project_id',
-        string='Project',
-        store=True,
-        readonly=True
+    # Related fields - UPDATED for Many2many
+    project_ids = fields.Many2many(
+        'project.project',
+        string='Projects',
+        compute='_compute_project_ids',
+        store=False
     )
     
-    product_display_name = fields.Char(
-        related='task_id.x_product_display_name',
-        string='Product',
-        readonly=True
+    # NEW: Computed field to show all products
+    products_display = fields.Char(
+        string='Products',
+        compute='_compute_products_display',
+        store=False
     )
     
     # Computed fields
@@ -215,6 +218,12 @@ class ProjectTaskSample(models.Model):
         store=False
     )
     
+    @api.depends('task_ids', 'task_ids.project_id')
+    def _compute_project_ids(self):
+        """Compute projects from tasks"""
+        for record in self:
+            record.project_ids = record.task_ids.mapped('project_id')
+    
     @api.depends('tracking_type')
     def _compute_type_display(self):
         """Compute display name based on type"""
@@ -223,6 +232,20 @@ class ProjectTaskSample(models.Model):
                 record.type_display = 'Sample'
             else:
                 record.type_display = 'Shipment'
+    
+    @api.depends('task_ids.x_product_display_name')
+    def _compute_products_display(self):
+        """Compute display of all products from tasks"""
+        for record in self:
+            products = record.task_ids.mapped('x_product_display_name')
+            products = [p for p in products if p]  # Filter empty values
+            if products:
+                if len(products) <= 3:
+                    record.products_display = ', '.join(products)
+                else:
+                    record.products_display = ', '.join(products[:3]) + f' (+{len(products) - 3} more)'
+            else:
+                record.products_display = ''
     
     @api.depends('sample_cost', 'shipping_cost')
     def _compute_total_cost(self):
@@ -316,13 +339,14 @@ class ProjectTaskSample(models.Model):
                 'notes': f'{self.type_display} requested from supplier' if self.tracking_type == 'sample' else 'Shipment initiated'
             })
         
-        # Create activity for follow-up
-        self.activity_schedule(
-            'mail.mail_activity_data_todo',
-            summary=f'Follow up on {self.type_display.lower()} request',
-            date_deadline=fields.Date.today() + timedelta(days=7),
-            user_id=self.env.user.id
-        )
+        # Create activity for follow-up - for first task
+        if self.task_ids:
+            self.activity_schedule(
+                'mail.mail_activity_data_todo',
+                summary=f'Follow up on {self.type_display.lower()} request',
+                date_deadline=fields.Date.today() + timedelta(days=7),
+                user_id=self.env.user.id
+            )
     
     def action_mark_in_transit(self):
         """Mark as in transit"""
@@ -415,19 +439,32 @@ class ProjectTaskSample(models.Model):
         ])
         
         for record in overdue_records:
-            # Create activity for overdue items
-            record.activity_schedule(
-                'mail.mail_activity_data_warning',
-                summary=f'{record.type_display} {record.reference} is overdue',
-                date_deadline=fields.Date.today(),
-                user_id=record.task_id.user_ids[:1].id or record.create_uid.id
-            )
+            # Create activity for overdue items - for first task
+            if record.task_ids:
+                first_task = record.task_ids[0]
+                record.activity_schedule(
+                    'mail.mail_activity_data_warning',
+                    summary=f'{record.type_display} {record.reference} is overdue',
+                    date_deadline=fields.Date.today(),
+                    user_id=first_task.user_ids[:1].id or record.create_uid.id
+                )
     
     def name_get(self):
-        """Display name with reference and product"""
+        """Display name with reference and products"""
         result = []
         for record in self:
-            name = f"{record.reference} - {record.product_display_name}"
+            # Show first product or multiple indicator
+            products = record.task_ids.mapped('x_product_display_name')
+            products = [p for p in products if p]
+            if products:
+                if len(products) == 1:
+                    product_info = products[0]
+                else:
+                    product_info = f"{products[0]} (+{len(products) - 1} more)"
+            else:
+                product_info = "No product"
+                
+            name = f"{record.reference} - {product_info}"
             if record.tracking_type == 'shipment':
                 name = f"[SHIP] {name}"
             result.append((record.id, name))

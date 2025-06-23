@@ -8,11 +8,11 @@ class ProjectTaskSampleWizard(models.TransientModel):
     _name = 'project.task.sample.wizard'
     _description = 'Create Multiple Sample or Shipment Requests'
     
-    task_id = fields.Many2one(
+    task_ids = fields.Many2many(
         'project.task',
-        string='Task',
+        string='Tasks',
         required=True,
-        readonly=True
+        help='Tasks to include in this request'
     )
     
     tracking_type = fields.Selection([
@@ -55,6 +55,24 @@ class ProjectTaskSampleWizard(models.TransientModel):
         help='Additional notes for all requests'
     )
     
+    # Computed field to show products
+    products_summary = fields.Text(
+        string='Products Summary',
+        compute='_compute_products_summary',
+        store=False
+    )
+    
+    @api.depends('task_ids')
+    def _compute_products_summary(self):
+        """Show summary of products from selected tasks"""
+        for wizard in self:
+            products = wizard.task_ids.mapped('x_product_display_name')
+            products = [p for p in products if p]
+            if products:
+                wizard.products_summary = '\n'.join([f'• {p}' for p in products])
+            else:
+                wizard.products_summary = 'No products defined in selected tasks'
+    
     @api.model
     def default_get(self, fields_list):
         res = super().default_get(fields_list)
@@ -64,7 +82,7 @@ class ProjectTaskSampleWizard(models.TransientModel):
         if task_id:
             task = self.env['project.task'].browse(task_id)
             res.update({
-                'task_id': task_id,
+                'task_ids': [(6, 0, [task_id])],
                 'sample_description': task.x_product_display_name or '',
                 'supplier_ids': [(6, 0, task.x_potential_supplier_ids.ids)] if task.x_potential_supplier_ids else False,
             })
@@ -78,12 +96,16 @@ class ProjectTaskSampleWizard(models.TransientModel):
         if not self.supplier_ids:
             raise UserError('Please select at least one supplier.')
         
+        if not self.task_ids:
+            raise UserError('Please select at least one task.')
+        
         Sample = self.env['project.task.sample']
         created_samples = Sample
         
+        # Create one sample/shipment per supplier
         for supplier in self.supplier_ids:
             sample_vals = {
-                'task_id': self.task_id.id,
+                'task_ids': [(6, 0, self.task_ids.ids)],
                 'tracking_type': self.tracking_type,
                 'supplier_id': supplier.id,
                 'sample_description': self.sample_description,
