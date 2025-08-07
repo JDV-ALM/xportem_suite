@@ -6,10 +6,11 @@
         <field name="sequence">100</field>
     </record>
 
-    <!-- Dashboard records without the dashboard_group_id field initially -->
+    <!-- Dashboard records with spreadsheet data -->
     <record id="spreadsheet_dashboard_procurement_daily" model="spreadsheet.dashboard">
         <field name="name">Seguimiento Diario de Procura</field>
         <field name="dashboard_group_id" ref="spreadsheet_dashboard_group_procurement"/>
+        <field name="spreadsheet_binary_data" type="base64" file="xportem_spreadsheet_dashboard/data/files/procurement_daily_dashboard.json"/>
         <field name="group_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="sequence">100</field>
     </record>
@@ -17,6 +18,7 @@
     <record id="spreadsheet_dashboard_procurement_quotations" model="spreadsheet.dashboard">
         <field name="name">Análisis de Cotizaciones</field>
         <field name="dashboard_group_id" ref="spreadsheet_dashboard_group_procurement"/>
+        <field name="spreadsheet_binary_data" type="base64" file="xportem_spreadsheet_dashboard/data/files/procurement_quotations_dashboard.json"/>
         <field name="group_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="sequence">200</field>
     </record>
@@ -24,6 +26,7 @@
     <record id="spreadsheet_dashboard_procurement_tracking" model="spreadsheet.dashboard">
         <field name="name">Tracking de Muestras y Envíos</field>
         <field name="dashboard_group_id" ref="spreadsheet_dashboard_group_procurement"/>
+        <field name="spreadsheet_binary_data" type="base64" file="xportem_spreadsheet_dashboard/data/files/procurement_tracking_dashboard.json"/>
         <field name="group_ids" eval="[(4, ref('base.group_user'))]"/>
         <field name="sequence">300</field>
     </record>
