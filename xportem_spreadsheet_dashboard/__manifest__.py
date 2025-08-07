@@ -54,7 +54,6 @@ Technical Details:
         'xportem_project_extension',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'data/dashboards.xml',
     ],
     'demo': [],
