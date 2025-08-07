@@ -1,0 +1,147 @@
+{
+    "version": 21,
+    "sheets": [
+      {
+        "id": "sheet1",
+        "name": "Cotizaciones",
+        "colNumber": 8,
+        "rowNumber": 60,
+        "rows": {
+          "5": { "size": 40 },
+          "20": { "size": 40 },
+          "35": { "size": 40 }
+        },
+        "cols": {
+          "0": { "size": 350 },
+          "1": { "size": 100 },
+          "2": { "size": 120 },
+          "3": { "size": 50 },
+          "4": { "size": 350 },
+          "5": { "size": 100 },
+          "6": { "size": 120 }
+        },
+        "merges": [],
+        "cells": {
+          "A6": {
+            "content": "[Cotizaciones por Proveedor](odoo://view/{\"viewType\":\"pivot\",\"action\":{\"domain\":[[\"task_id.x_is_evaluation\",\"=\",true]],\"context\":{\"group_by\":[\"supplier_id\"],\"pivot_measures\":[\"__count\",\"price_total\"],\"pivot_column_groupby\":[],\"pivot_row_groupby\":[\"supplier_id\"]},\"modelName\":\"project.task.quotation.line\",\"views\":[[false,\"pivot\"],[false,\"graph\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Análisis de Cotizaciones\"})"
+          },
+          "A7": { "content": "=_t(\"Proveedor\")" },
+          "A8": { "content": "=PIVOT.HEADER(1,\"#supplier_id\",1)" },
+          "A9": { "content": "=PIVOT.HEADER(1,\"#supplier_id\",2)" },
+          "A10": { "content": "=PIVOT.HEADER(1,\"#supplier_id\",3)" },
+          "A11": { "content": "=PIVOT.HEADER(1,\"#supplier_id\",4)" },
+          "A12": { "content": "=PIVOT.HEADER(1,\"#supplier_id\",5)" },
+          
+          "B7": { "content": "=_t(\"Cotizaciones\")" },
+          "B8": { "content": "=PIVOT.VALUE(1,\"__count\",\"#supplier_id\",1)" },
+          "B9": { "content": "=PIVOT.VALUE(1,\"__count\",\"#supplier_id\",2)" },
+          "B10": { "content": "=PIVOT.VALUE(1,\"__count\",\"#supplier_id\",3)" },
+          "B11": { "content": "=PIVOT.VALUE(1,\"__count\",\"#supplier_id\",4)" },
+          "B12": { "content": "=PIVOT.VALUE(1,\"__count\",\"#supplier_id\",5)" },
+          
+          "C7": { "content": "=_t(\"Total USD\")" },
+          "C8": { "content": "=PIVOT.VALUE(1,\"price_total\",\"#supplier_id\",1)" },
+          "C9": { "content": "=PIVOT.VALUE(1,\"price_total\",\"#supplier_id\",2)" },
+          "C10": { "content": "=PIVOT.VALUE(1,\"price_total\",\"#supplier_id\",3)" },
+          "C11": { "content": "=PIVOT.VALUE(1,\"price_total\",\"#supplier_id\",4)" },
+          "C12": { "content": "=PIVOT.VALUE(1,\"price_total\",\"#supplier_id\",5)" },
+          
+          "A21": {
+            "content": "[Comparación de Precios por Producto](odoo://view/{\"viewType\":\"pivot\",\"action\":{\"domain\":[],\"context\":{\"group_by\":[\"task_id.x_product_display_name\",\"supplier_id\"],\"pivot_measures\":[\"price_unit\"],\"pivot_column_groupby\":[\"supplier_id\"],\"pivot_row_groupby\":[\"task_id.x_product_display_name\"]},\"modelName\":\"project.task.quotation.line\",\"views\":[[false,\"pivot\"],[false,\"graph\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Comparación de Precios\"})"
+          },
+          
+          "E6": {
+            "content": "[Tiempo de Entrega por Proveedor](odoo://view/{\"viewType\":\"graph\",\"action\":{\"domain\":[],\"context\":{\"group_by\":[\"supplier_id\"],\"graph_measure\":\"lead_time\",\"graph_mode\":\"bar\",\"graph_groupbys\":[\"supplier_id\"]},\"modelName\":\"project.task.quotation.line\",\"views\":[[false,\"graph\"],[false,\"pivot\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Análisis de Tiempos\"})"
+          },
+          
+          "E21": {
+            "content": "[Cotizaciones Pendientes de Respuesta](odoo://view/{\"viewType\":\"list\",\"action\":{\"domain\":[[\"state\",\"=\",\"sent\"]],\"context\":{},\"modelName\":\"project.task.quotation.line\",\"views\":[[false,\"list\"],[false,\"form\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Esperando Respuesta\"})"
+          },
+          
+          "A36": {
+            "content": "[Top 5 Productos más Cotizados](odoo://view/{\"viewType\":\"pivot\",\"action\":{\"domain\":[],\"context\":{\"group_by\":[\"task_id.x_product_display_name\"],\"pivot_measures\":[\"__count\"],\"pivot_column_groupby\":[],\"pivot_row_groupby\":[\"task_id.x_product_display_name\"]},\"modelName\":\"project.task.quotation.line\",\"views\":[[false,\"pivot\"],[false,\"graph\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Productos más Cotizados\"})"
+          }
+        },
+        "styles": {
+          "A6": 1,
+          "A21": 1,
+          "E6": 1,
+          "E21": 1,
+          "A36": 1,
+          "A7:C7": 2,
+          "A8:C12": 3
+        },
+        "conditionalFormats": [
+          {
+            "rule": {
+              "type": "DataBarRule",
+              "color": 15531509,
+              "rangeValues": "C8:C12"
+            },
+            "id": "supplier-amount-bars",
+            "ranges": ["A8:A12"]
+          }
+        ],
+        "figures": [
+          {
+            "id": "lead-time-chart",
+            "x": 550,
+            "y": 155,
+            "width": 545,
+            "height": 300,
+            "tag": "chart",
+            "data": {
+              "title": { "text": "Tiempo Promedio de Entrega (días)" },
+              "background": "#FFFFFF",
+              "legendPosition": "none",
+              "type": "odoo_bar",
+              "metaData": {
+                "groupBy": ["supplier_id"],
+                "measure": "lead_time",
+                "order": "ASC",
+                "resModel": "project.task.quotation.line",
+                "mode": "bar"
+              },
+              "searchParams": {
+                "domain": [],
+                "groupBy": ["supplier_id"],
+                "orderBy": []
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "pivots": {
+      "1": {
+        "type": "ODOO",
+        "fieldMatching": {},
+        "context": {},
+        "domain": [["task_id.x_is_evaluation", "=", true]],
+        "id": "1",
+        "measures": [
+          { "id": "__count", "fieldName": "__count" },
+          { "id": "price_total", "fieldName": "price_total" }
+        ],
+        "model": "project.task.quotation.line",
+        "name": "Cotizaciones por Proveedor",
+        "sortedColumn": {
+          "groupId": [[], []],
+          "measure": "__count",
+          "order": "desc"
+        },
+        "formulaId": "1",
+        "columns": [],
+        "rows": [{ "fieldName": "supplier_id" }]
+      }
+    },
+    "globalFilters": [
+      {
+        "id": "date-filter",
+        "type": "date",
+        "label": "Período",
+        "defaultValue": "last_month",
+        "rangeType": "relative"
+      }
+    ]
+  }

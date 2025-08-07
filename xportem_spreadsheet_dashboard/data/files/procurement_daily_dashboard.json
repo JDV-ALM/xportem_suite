@@ -1,0 +1,293 @@
+{
+    "version": 21,
+    "sheets": [
+      {
+        "id": "sheet1",
+        "name": "Dashboard Diario",
+        "colNumber": 8,
+        "rowNumber": 50,
+        "rows": {
+          "5": { "size": 40 },
+          "10": { "size": 40 },
+          "15": { "size": 40 },
+          "20": { "size": 29 },
+          "21": { "size": 29 },
+          "22": { "size": 29 },
+          "23": { "size": 29 },
+          "24": { "size": 29 }
+        },
+        "cols": {
+          "0": { "size": 300 },
+          "1": { "size": 120 },
+          "2": { "size": 120 },
+          "3": { "size": 50 },
+          "4": { "size": 300 },
+          "5": { "size": 120 },
+          "6": { "size": 120 }
+        },
+        "merges": [],
+        "cells": {
+          "A6": {
+            "content": "[Solicitudes del Día](odoo://view/{\"viewType\":\"kanban\",\"action\":{\"domain\":[[\"create_date\",\">=\",(datetime.date.today()).strftime('%Y-%m-%d')],[\"x_is_request\",\"=\",true]],\"context\":{\"group_by\":[\"stage_id\"]},\"modelName\":\"project.task\",\"views\":[[false,\"kanban\"],[false,\"list\"],[false,\"form\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Solicitudes de Hoy\"})"
+          },
+          "A11": {
+            "content": "[Productos por Estado](odoo://view/{\"viewType\":\"pivot\",\"action\":{\"domain\":[[\"x_is_request\",\"=\",true]],\"context\":{\"group_by\":[\"stage_id\"],\"pivot_measures\":[\"__count\"],\"pivot_column_groupby\":[\"stage_id\"],\"pivot_row_groupby\":[\"x_product_display_name\"]},\"modelName\":\"project.task\",\"views\":[[false,\"pivot\"],[false,\"graph\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Análisis por Estado\"})"
+          },
+          "A16": {
+            "content": "[Solicitudes Urgentes](odoo://view/{\"viewType\":\"list\",\"action\":{\"domain\":[[\"x_urgency\",\"in\",[\"urgent\",\"critical\"]],[\"x_is_request\",\"=\",true],[\"stage_id.fold\",\"=\",false]],\"context\":{},\"modelName\":\"project.task\",\"views\":[[false,\"list\"],[false,\"kanban\"],[false,\"form\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Solicitudes Urgentes\"})"
+          },
+          "A20": { "content": "=_t(\"Producto\")" },
+          "A21": { "content": "=ODOO.LIST(1,1,\"x_product_display_name\")" },
+          "A22": { "content": "=ODOO.LIST(1,2,\"x_product_display_name\")" },
+          "A23": { "content": "=ODOO.LIST(1,3,\"x_product_display_name\")" },
+          "A24": { "content": "=ODOO.LIST(1,4,\"x_product_display_name\")" },
+          "A25": { "content": "=ODOO.LIST(1,5,\"x_product_display_name\")" },
+          
+          "B20": { "content": "=_t(\"Cliente\")" },
+          "B21": { "content": "=ODOO.LIST(1,1,\"project_id.partner_id\")" },
+          "B22": { "content": "=ODOO.LIST(1,2,\"project_id.partner_id\")" },
+          "B23": { "content": "=ODOO.LIST(1,3,\"project_id.partner_id\")" },
+          "B24": { "content": "=ODOO.LIST(1,4,\"project_id.partner_id\")" },
+          "B25": { "content": "=ODOO.LIST(1,5,\"project_id.partner_id\")" },
+          
+          "C20": { "content": "=_t(\"Urgencia\")" },
+          "C21": { "content": "=ODOO.LIST(1,1,\"x_urgency\")" },
+          "C22": { "content": "=ODOO.LIST(1,2,\"x_urgency\")" },
+          "C23": { "content": "=ODOO.LIST(1,3,\"x_urgency\")" },
+          "C24": { "content": "=ODOO.LIST(1,4,\"x_urgency\")" },
+          "C25": { "content": "=ODOO.LIST(1,5,\"x_urgency\")" },
+          
+          "E16": {
+            "content": "[Muestras en Tránsito](odoo://view/{\"viewType\":\"list\",\"action\":{\"domain\":[[\"state\",\"=\",\"in_transit\"],[\"tracking_type\",\"=\",\"sample\"]],\"context\":{},\"modelName\":\"project.task.sample\",\"views\":[[false,\"list\"],[false,\"kanban\"],[false,\"form\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Muestras en Tránsito\"})"
+          },
+          "E20": { "content": "=_t(\"Referencia\")" },
+          "E21": { "content": "=ODOO.LIST(2,1,\"reference\")" },
+          "E22": { "content": "=ODOO.LIST(2,2,\"reference\")" },
+          "E23": { "content": "=ODOO.LIST(2,3,\"reference\")" },
+          "E24": { "content": "=ODOO.LIST(2,4,\"reference\")" },
+          "E25": { "content": "=ODOO.LIST(2,5,\"reference\")" },
+          
+          "F20": { "content": "=_t(\"Días en Tránsito\")" },
+          "F21": { "content": "=ODOO.LIST(2,1,\"days_in_transit\")" },
+          "F22": { "content": "=ODOO.LIST(2,2,\"days_in_transit\")" },
+          "F23": { "content": "=ODOO.LIST(2,3,\"days_in_transit\")" },
+          "F24": { "content": "=ODOO.LIST(2,4,\"days_in_transit\")" },
+          "F25": { "content": "=ODOO.LIST(2,5,\"days_in_transit\")" },
+          
+          "G20": { "content": "=_t(\"Ubicación\")" },
+          "G21": { "content": "=ODOO.LIST(2,1,\"current_location_id\")" },
+          "G22": { "content": "=ODOO.LIST(2,2,\"current_location_id\")" },
+          "G23": { "content": "=ODOO.LIST(2,3,\"current_location_id\")" },
+          "G24": { "content": "=ODOO.LIST(2,4,\"current_location_id\")" },
+          "G25": { "content": "=ODOO.LIST(2,5,\"current_location_id\")" }
+        },
+        "styles": {
+          "A6": 1,
+          "A11": 1,
+          "A16": 1,
+          "E16": 1,
+          "A20:C20": 2,
+          "E20:G20": 2,
+          "A21:C25": 3,
+          "E21:G25": 3
+        },
+        "formats": {},
+        "borders": {
+          "A6:G6": 1,
+          "A11:G11": 1,
+          "A16:C16": 1,
+          "E16:G16": 1,
+          "A20:C20": 2,
+          "E20:G20": 2
+        },
+        "conditionalFormats": [
+          {
+            "rule": {
+              "type": "CellIsRule",
+              "operator": "Equal",
+              "value": "critical",
+              "style": { "fillColor": "#FF9999" }
+            },
+            "id": "urgency-critical",
+            "ranges": ["C21:C25"]
+          },
+          {
+            "rule": {
+              "type": "CellIsRule",
+              "operator": "Equal", 
+              "value": "urgent",
+              "style": { "fillColor": "#FFCC99" }
+            },
+            "id": "urgency-urgent",
+            "ranges": ["C21:C25"]
+          }
+        ],
+        "figures": [
+          {
+            "id": "kpi-solicitudes-dia",
+            "x": 0,
+            "y": 12,
+            "width": 213,
+            "height": 101,
+            "tag": "chart",
+            "data": {
+              "baselineColorDown": "#DC6965",
+              "baselineColorUp": "#00A04A",
+              "baselineMode": "percentage",
+              "title": { 
+                "text": "Solicitudes Hoy",
+                "bold": true,
+                "color": "#434343"
+              },
+              "type": "scorecard",
+              "background": "#E3F2FD",
+              "baseline": "Data!B2",
+              "baselineDescr": "vs ayer",
+              "keyValue": "Data!A2",
+              "humanize": false
+            }
+          },
+          {
+            "id": "kpi-solicitudes-activas",
+            "x": 223,
+            "y": 12,
+            "width": 213,
+            "height": 101,
+            "tag": "chart",
+            "data": {
+              "title": {
+                "text": "Solicitudes Activas",
+                "bold": true,
+                "color": "#434343"
+              },
+              "type": "scorecard",
+              "background": "#FFF3E0",
+              "keyValue": "Data!A3",
+              "humanize": false
+            }
+          },
+          {
+            "id": "kpi-cotizaciones-pendientes",
+            "x": 446,
+            "y": 12,
+            "width": 213,
+            "height": 101,
+            "tag": "chart",
+            "data": {
+              "title": {
+                "text": "Cotizaciones Pendientes",
+                "bold": true,
+                "color": "#434343"
+              },
+              "type": "scorecard",
+              "background": "#FCE4EC",
+              "keyValue": "Data!A4",
+              "humanize": false
+            }
+          },
+          {
+            "id": "kpi-muestras-transito",
+            "x": 669,
+            "y": 12,
+            "width": 213,
+            "height": 101,
+            "tag": "chart",
+            "data": {
+              "title": {
+                "text": "Muestras en Tránsito",
+                "bold": true,
+                "color": "#434343"
+              },
+              "type": "scorecard",
+              "background": "#E8F5E9",
+              "keyValue": "Data!A5",
+              "humanize": false
+            }
+          }
+        ],
+        "tables": [],
+        "areGridLinesVisible": true,
+        "isVisible": true
+      },
+      {
+        "id": "data-sheet",
+        "name": "Data",
+        "colNumber": 5,
+        "rowNumber": 20,
+        "cells": {
+          "A1": { "content": "=_t(\"Métrica\")" },
+          "A2": { "content": "=ODOO.PIVOT.VALUE(1,\"__count\",\"create_date:day\",TODAY())" },
+          "A3": { "content": "=ODOO.PIVOT.VALUE(1,\"__count\",\"stage_id.fold\",false)" },
+          "A4": { "content": "=ODOO.PIVOT.VALUE(2,\"__count\",\"state\",\"received\")" },
+          "A5": { "content": "=ODOO.PIVOT.VALUE(3,\"__count\",\"state\",\"in_transit\")" },
+          
+          "B1": { "content": "=_t(\"Comparación\")" },
+          "B2": { "content": "=ODOO.PIVOT.VALUE(1,\"__count\",\"create_date:day\",TODAY()-1)" }
+        },
+        "isVisible": false
+      }
+    ],
+    "pivots": {
+      "1": {
+        "type": "ODOO",
+        "fieldMatching": {},
+        "context": {},
+        "domain": [["x_is_request", "=", true]],
+        "id": "1",
+        "measures": [{ "id": "__count", "fieldName": "__count" }],
+        "model": "project.task",
+        "name": "Solicitudes por Día",
+        "formulaId": "1",
+        "columns": [{ "fieldName": "create_date:day" }],
+        "rows": []
+      },
+      "2": {
+        "type": "ODOO",
+        "fieldMatching": {},
+        "context": {},
+        "domain": [["x_is_evaluation", "=", true]],
+        "id": "2",
+        "measures": [{ "id": "__count", "fieldName": "__count" }],
+        "model": "project.task.quotation.line",
+        "name": "Cotizaciones por Estado",
+        "formulaId": "2",
+        "columns": [{ "fieldName": "state" }],
+        "rows": []
+      },
+      "3": {
+        "type": "ODOO",
+        "fieldMatching": {},
+        "context": {},
+        "domain": [["tracking_type", "=", "sample"]],
+        "id": "3",
+        "measures": [{ "id": "__count", "fieldName": "__count" }],
+        "model": "project.task.sample",
+        "name": "Muestras por Estado",
+        "formulaId": "3",
+        "columns": [{ "fieldName": "state" }],
+        "rows": []
+      }
+    },
+    "lists": {
+      "1": {
+        "columns": ["x_product_display_name", "project_id.partner_id", "x_urgency"],
+        "domain": [["x_urgency", "in", ["urgent", "critical"]], ["x_is_request", "=", true], ["stage_id.fold", "=", false]],
+        "model": "project.task",
+        "context": {},
+        "orderBy": [{ "name": "x_urgency", "asc": false }],
+        "id": "1",
+        "name": "Solicitudes Urgentes"
+      },
+      "2": {
+        "columns": ["reference", "days_in_transit", "current_location_id"],
+        "domain": [["state", "=", "in_transit"], ["tracking_type", "=", "sample"]],
+        "model": "project.task.sample",
+        "context": {},
+        "orderBy": [{ "name": "days_in_transit", "asc": false }],
+        "id": "2",
+        "name": "Muestras en Tránsito"
+      }
+    },
+    "globalFilters": [],
+    "odooVersion": 18
+  }

@@ -1,0 +1,33 @@
+<!-- En xportem_project_extension/data/dashboards.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="spreadsheet_dashboard_procurement_daily" model="spreadsheet.dashboard">
+        <field name="name">Seguimiento Diario de Procura</field>
+        <field name="spreadsheet_binary_data" type="base64" file="xportem_project_extension/data/files/procurement_daily_dashboard.json"/>
+        <field name="main_data_model_ids" eval="[(4, ref('project.model_project_task'))]"/>
+        <field name="dashboard_group_id" ref="spreadsheet_dashboard.spreadsheet_dashboard_group_operations"/>
+        <field name="group_ids" eval="[Command.link(ref('base.group_user'))]"/>
+        <field name="sequence">100</field>
+        <field name="is_published">True</field>
+    </record>
+
+    <record id="spreadsheet_dashboard_procurement_quotations" model="spreadsheet.dashboard">
+        <field name="name">Análisis de Cotizaciones</field>
+        <field name="spreadsheet_binary_data" type="base64" file="xportem_project_extension/data/files/procurement_quotations_dashboard.json"/>
+        <field name="main_data_model_ids" eval="[(4, ref('xportem_project.model_project_task_quotation_line'))]"/>
+        <field name="dashboard_group_id" ref="spreadsheet_dashboard.spreadsheet_dashboard_group_operations"/>
+        <field name="group_ids" eval="[Command.link(ref('base.group_user'))]"/>
+        <field name="sequence">200</field>
+        <field name="is_published">True</field>
+    </record>
+
+    <record id="spreadsheet_dashboard_procurement_tracking" model="spreadsheet.dashboard">
+        <field name="name">Tracking de Muestras y Envíos</field>
+        <field name="spreadsheet_binary_data" type="base64" file="xportem_project_extension/data/files/procurement_tracking_dashboard.json"/>
+        <field name="main_data_model_ids" eval="[(4, ref('xportem_project_extension.model_project_task_sample'))]"/>
+        <field name="dashboard_group_id" ref="spreadsheet_dashboard.spreadsheet_dashboard_group_operations"/>
+        <field name="group_ids" eval="[Command.link(ref('base.group_user'))]"/>
+        <field name="sequence">300</field>
+        <field name="is_published">True</field>
+    </record>
+</odoo>
